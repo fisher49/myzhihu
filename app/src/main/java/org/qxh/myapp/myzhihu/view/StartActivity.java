@@ -1,7 +1,7 @@
 package org.qxh.myapp.myzhihu.view;
 
-import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.view.Window;
 import android.view.WindowManager;
@@ -11,35 +11,42 @@ import android.view.animation.AnimationUtils;
 import com.facebook.drawee.view.SimpleDraweeView;
 
 import org.qxh.myapp.myzhihu.R;
+import org.qxh.myapp.myzhihu.app.BaseActivity;
+import org.qxh.myapp.myzhihu.app.EventBody;
 import org.qxh.myapp.myzhihu.config.Constant;
+import org.qxh.myapp.myzhihu.presenter.StartPresenter;
 
-import java.io.File;
-
-public class StartActivity extends Activity {
+public class StartActivity extends BaseActivity {
 
     private SimpleDraweeView fs_start;
+    private StartPresenter startPresenter;
+    private Boolean isInitView = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_start);
+        startPresenter = new StartPresenter(this);
+    }
 
-        initView();
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        if(!isInitView){
+            isInitView = false;
+            initView();
+        }
     }
 
     private void initView(){
         fs_start = (SimpleDraweeView)this.findViewById(R.id.fs_start);
+        startPresenter.getLocalImage();
+    }
 
-        File dir = getFilesDir();
-        final File imageFile = new File(dir, Constant.DEFAULT_START_IMAGE);
-        if(imageFile.exists()){
-
-        }else{
-//            fs_start.setImageResource(R.mipmap.start);
-            fs_start.setBackgroundResource(R.mipmap.start);
-        }
-
+    private void startImageAnimation(){
         Animation scaleAnimation = AnimationUtils.loadAnimation(this, R.anim.start_activity_animation);
         scaleAnimation.setAnimationListener(new Animation.AnimationListener() {
             @Override
@@ -49,8 +56,7 @@ public class StartActivity extends Activity {
 
             @Override
             public void onAnimationEnd(Animation animation) {
-                Intent intent = new Intent(StartActivity.this, MainActivity.class);
-                startActivity(intent);
+                startPresenter.downloadRemoteImage();
             }
 
             @Override
@@ -60,4 +66,27 @@ public class StartActivity extends Activity {
         });
         fs_start.startAnimation(scaleAnimation);
     }
+
+    private void luanchMain(){
+        Intent intent = new Intent(StartActivity.this, MainActivity.class);
+        startActivity(intent);
+    }
+
+    public void onEvent(EventBody event){
+        switch (event.getEventName()){
+            case Constant.EVENT_START_SHOW_IMAGE_BITMAP:
+                fs_start.setImageBitmap((Bitmap) event.getParameter());
+                startImageAnimation();
+                break;
+            case Constant.EVENT_START_SHOW_IMAGE_RESOURCE:
+                fs_start.setImageResource((int) event.getParameter());
+                startImageAnimation();
+                break;
+            case Constant.EVENT_DEFAULT:
+                luanchMain();
+                break;
+            default:break;
+        }
+    }
+
 }

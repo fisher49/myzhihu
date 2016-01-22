@@ -1,4 +1,4 @@
-package org.qxh.myapp.myzhihu.org.qxh.myapp.myzhihu.model.net;
+package org.qxh.myapp.myzhihu.model.net;
 
 import org.qxh.myapp.myzhihu.config.Constant;
 
@@ -12,15 +12,17 @@ import okhttp3.Response;
  * Created by QXH on 2016/1/21.
  */
 public class HttpUtils {
-    private static OkHttpClient okHttpClient;
+    private OkHttpClient okHttpClient;
+    private static HttpUtils httpUtils;
     private static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
 
     private HttpUtils(){
         okHttpClient = new OkHttpClient();
     }
 
-    public static OkHttpClient getInstance(){
-        return okHttpClient;
+    public static HttpUtils getInstance(){
+        httpUtils = new HttpUtils();
+        return httpUtils;
     }
 
     public String get(String url) throws Exception{
