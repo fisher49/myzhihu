@@ -44,7 +44,7 @@ public class StartPresenter {
 
     public void downloadRemoteImage(){
         try {
-            httpUtils.getAsyn(Constant.START_IMAGE_URL, new okhttp3.Callback(){
+            httpUtils.getDefaultUrlAsyn(Constant.START_IMAGE_URL, new okhttp3.Callback(){
 
                 @Override
                 public void onFailure(Call call, IOException e) {
@@ -54,8 +54,28 @@ public class StartPresenter {
                 @Override
                 public void onResponse(Call call, Response response) throws IOException {
                     try {
-                        JSONObject jsonObject = new JSONObject(response.body().toString());
-                        saveImageFile(jsonObject.getString(Constant.JSON_TYPE_START_IMAGE).getBytes());
+                        if(response.isSuccessful()) {
+                            JSONObject jsonObject = new JSONObject(response.body().string());
+
+                            String imageUrl = jsonObject.getString(Constant.JSON_TYPE_START_IMAGE);
+                            try {
+                                httpUtils.getAsyn(imageUrl, new okhttp3.Callback(){
+                                    @Override
+                                    public void onFailure(Call call, IOException e) {
+
+                                    }
+
+                                    @Override
+                                    public void onResponse(Call call, Response response) throws IOException {
+                                        if(response.isSuccessful()) {
+                                            saveImageFile(response.body().bytes());
+                                        }
+                                    }
+                                });
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }

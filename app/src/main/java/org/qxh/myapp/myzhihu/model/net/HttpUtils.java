@@ -1,5 +1,9 @@
 package org.qxh.myapp.myzhihu.model.net;
 
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+
 import org.qxh.myapp.myzhihu.config.Constant;
 
 import okhttp3.MediaType;
@@ -46,9 +50,13 @@ public class HttpUtils {
         return response.toString();
     }
 
+    public void getDefaultUrlAsyn(String url, okhttp3.Callback callback) throws Exception{
+        getAsyn(Constant.BASE_URL+url, callback);
+    }
+
     public void getAsyn(String url, okhttp3.Callback callback) throws Exception{
         Request request = new Request.Builder()
-                .url(Constant.BASE_URL+url)
+                .url(url)
                 .build();
         okHttpClient.newCall(request).enqueue(callback);
     }
@@ -61,6 +69,18 @@ public class HttpUtils {
                 .build();
 
         okHttpClient.newCall(request).enqueue(callback);
+    }
+
+    public static boolean isNetworkConnected(Context context) {
+        if (context != null) {
+            ConnectivityManager mConnectivityManager = (ConnectivityManager) context
+                    .getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo mNetworkInfo = mConnectivityManager.getActiveNetworkInfo();
+            if (mNetworkInfo != null) {
+                return mNetworkInfo.isAvailable();
+            }
+        }
+        return false;
     }
 
 }
