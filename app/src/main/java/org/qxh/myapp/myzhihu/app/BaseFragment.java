@@ -8,8 +8,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import de.greenrobot.event.EventBus;
-
 /**
  * Created by QXH on 2016/1/23.
  */
@@ -35,21 +33,23 @@ public abstract class BaseFragment extends Fragment{
         mActivity = null;
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
+//    @Override
+//    public void onStart() {
+//        super.onStart();
+//
+//        Log.i("fragment", "on start");
+//        EventBus.getDefault().register(this);
+//    }
+//
+//    @Override
+//    public void onStop() {
+//        super.onStop();
+//
+//        Log.i("fragment", "on Stop");
+//        EventBus.getDefault().unregister(this);
+//    }
 
-        EventBus.getDefault().register(this);
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-
-        EventBus.getDefault().unregister(this);
-    }
-
-    public void onEvent(EventBody event){
+    public void onEventMainThread(EventBody event){
 
     }
 

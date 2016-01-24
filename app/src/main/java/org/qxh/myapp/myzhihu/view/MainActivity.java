@@ -9,6 +9,8 @@ import android.view.MenuItem;
 
 import org.qxh.myapp.myzhihu.R;
 import org.qxh.myapp.myzhihu.app.BaseActivity;
+import org.qxh.myapp.myzhihu.app.EventBody;
+import org.qxh.myapp.myzhihu.config.Constant;
 
 public class MainActivity extends BaseActivity {
 
@@ -54,5 +56,21 @@ public class MainActivity extends BaseActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
 //        return super.onOptionsItemSelected(item);
         return true;
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+    }
+
+    public void onEventMainThread(EventBody event){
+            switch (event.getEventName()) {
+                // 显示图片
+                case Constant.EVENT_START_SHOW_IMAGE_BITMAP:
+                    break;
+                default:
+                    onSubFragmentEvent(event, R.id.fm_topic_menu);
+                    break;
+            }
     }
 }

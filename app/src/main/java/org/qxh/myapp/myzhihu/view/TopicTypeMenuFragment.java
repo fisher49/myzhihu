@@ -5,14 +5,18 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import org.qxh.myapp.myzhihu.R;
 import org.qxh.myapp.myzhihu.app.BaseFragment;
 import org.qxh.myapp.myzhihu.app.CommonAdapter;
+import org.qxh.myapp.myzhihu.app.EventBody;
 import org.qxh.myapp.myzhihu.app.ViewHolder;
+import org.qxh.myapp.myzhihu.config.Constant;
+import org.qxh.myapp.myzhihu.model.entities.ThemeEntity;
+import org.qxh.myapp.myzhihu.presenter.TopicTypeMenuPresenter;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by QXH on 2016/1/23.
@@ -20,49 +24,55 @@ import java.util.List;
 public class TopicTypeMenuFragment extends BaseFragment{
 
     ListView lv_topic_list;
-    List<TopicItem> list_topic;
+    TopicTypeMenuPresenter presenter;
+//    List<ThemeEntity> list_topic;
     @Override
     protected View initView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_topic_type_menu, container, false);
 
         lv_topic_list = (ListView)view.findViewById(R.id.lv_topic_list);
 
-        initListData();
+        presenter = new TopicTypeMenuPresenter(getActivity());
+        presenter.getTopicInformation();
 
-        lv_topic_list.setAdapter(new CommonAdapter<TopicItem>(getActivity(), list_topic, R.layout.item_topic_list) {
-
-            @Override
-            public void convert(ViewHolder holder, TopicItem topicItem) {
-                holder.setText(R.id.tv_topic_list_item, topicItem.getTopicName());
-//                        .setImageResource(R.id.iv_topic_list_item, R.drawable.ic_star_white_24dp);
-            }
-        });
         return view;
     }
 
-    private void initListData() {
-        list_topic = new ArrayList<TopicItem>();
+    private void initMenuItems(ArrayList<ThemeEntity> themes){
 
-        for(int i=0; i<26; i++){
-//            list_topic.add(new TopicItem(String.format("longlongitme-02d%", i)));
-            String string = new String("你好abc");
-            list_topic.add(new TopicItem(string));
+        if(themes != null) {
+            lv_topic_list.setAdapter(new CommonAdapter<ThemeEntity>(getActivity(), themes, R.layout.item_topic_list) {
+
+                @Override
+                public void convert(ViewHolder holder, ThemeEntity topicItem) {
+                    holder.setText(R.id.tv_topic_list_item, topicItem.getName());
+//                        .setImageResource(R.id.iv_topic_list_item, R.drawable.ic_star_white_24dp);
+                }
+            });
+        }else {
+            Toast.makeText(getActivity(), R.string.err_loard_themes, Toast.LENGTH_LONG).show();
         }
     }
 
-    class TopicItem {
-        String topicName;
-
-        public TopicItem(String topicName) {
-            this.topicName = topicName;
-        }
-
-        public String getTopicName() {
-            return topicName;
-        }
-
-        public void setTopicName(String topicName) {
-            this.topicName = topicName;
+    public void onEventMainThread(EventBody event){
+        switch (event.getEventName()){
+            // 加载菜单theme信息
+            case Constant.EVENT_THEMES_LOARD:
+                initMenuItems((ArrayList<ThemeEntity>)event.getParameter());
+//            {
+//                ArrayList<ThemeEntity> list = new ArrayList<ThemeEntity>();
+//                for(int i=0; i<20; i++) {
+//                    list.add(new ThemeEntity(1, "1", "2", 1, "n"));
+//                }
+//                initMenuItems(list);
+//            }
+                break;
+            default:break;
         }
     }
+
+//    public void onEvent(ArrayList<ThemeEntity> list){
+//        initMenuItems(list);
+//    }
+
 }

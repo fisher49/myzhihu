@@ -73,7 +73,7 @@ public class StartActivity extends BaseActivity {
         startActivity(intent);
     }
 
-    public void onEvent(EventBody event){
+    public void onEventMainThread(EventBody event){
         switch (event.getEventName()){
             // 显示图片
             case Constant.EVENT_START_SHOW_IMAGE_BITMAP:
