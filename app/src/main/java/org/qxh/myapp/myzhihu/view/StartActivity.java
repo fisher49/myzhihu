@@ -7,6 +7,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.Toast;
 
 import com.facebook.drawee.view.SimpleDraweeView;
 
@@ -74,6 +75,7 @@ public class StartActivity extends BaseActivity {
 
     public void onEvent(EventBody event){
         switch (event.getEventName()){
+            // 显示图片
             case Constant.EVENT_START_SHOW_IMAGE_BITMAP:
                 fs_start.setImageBitmap((Bitmap) event.getParameter());
                 startImageAnimation();
@@ -82,6 +84,10 @@ public class StartActivity extends BaseActivity {
                 fs_start.setImageResource((int) event.getParameter());
                 startImageAnimation();
                 break;
+
+            // 启动主界面
+            case Constant.EVENT_START_LAUNCH_MAIN:
+                Toast.makeText(StartActivity.this, "更新图片失败", Toast.LENGTH_SHORT).show();
             case Constant.EVENT_DEFAULT:
                 luanchMain();
                 break;

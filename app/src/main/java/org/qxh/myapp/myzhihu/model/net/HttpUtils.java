@@ -6,6 +6,8 @@ import android.net.NetworkInfo;
 
 import org.qxh.myapp.myzhihu.config.Constant;
 
+import java.util.concurrent.TimeUnit;
+
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -21,7 +23,10 @@ public class HttpUtils {
     private static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
 
     private HttpUtils(){
-        okHttpClient = new OkHttpClient();
+        okHttpClient = new OkHttpClient.Builder()
+                .connectTimeout(1000, TimeUnit.MILLISECONDS)
+                .build();
+//        okHttpClient = new OkHttpClient();
     }
 
     public static HttpUtils getInstance(){

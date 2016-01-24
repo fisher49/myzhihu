@@ -62,13 +62,14 @@ public class StartPresenter {
                                 httpUtils.getAsyn(imageUrl, new okhttp3.Callback(){
                                     @Override
                                     public void onFailure(Call call, IOException e) {
-
+                                        EventBus.getDefault().post(Constant.EVENT_START_LAUNCH_MAIN);
                                     }
 
                                     @Override
                                     public void onResponse(Call call, Response response) throws IOException {
                                         if(response.isSuccessful()) {
                                             saveImageFile(response.body().bytes());
+                                            EventBus.getDefault().post(new EventBody());
                                         }
                                     }
                                 });
@@ -79,7 +80,7 @@ public class StartPresenter {
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-                    EventBus.getDefault().post(new EventBody());
+//                    EventBus.getDefault().post(new EventBody());
                 }
             });
         } catch (Exception e) {

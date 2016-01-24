@@ -1,3 +1,10 @@
 <resources>
-    <string name="app_name">myzhihu</string>
+    <string name="app_name">定制知乎</string>
+    
+    <string name="tv_login">请登入</string>
+    <string name="tv_favorite">我的收藏</string>
+    <string name="tv_offline">离线下载</string>
+    <string name="tv_home_page">首页</string>
+    <string name="mn_light">日间模式</string>
+    <string name="mn_dark">夜间模式</string>
 </resources>
