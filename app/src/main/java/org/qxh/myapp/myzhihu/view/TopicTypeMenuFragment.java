@@ -25,7 +25,6 @@ public class TopicTypeMenuFragment extends BaseFragment{
 
     ListView lv_topic_list;
     TopicTypeMenuPresenter presenter;
-//    List<ThemeEntity> list_topic;
     @Override
     protected View initView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_topic_type_menu, container, false);
@@ -45,7 +44,8 @@ public class TopicTypeMenuFragment extends BaseFragment{
 
                 @Override
                 public void convert(ViewHolder holder, ThemeEntity topicItem) {
-                    holder.setText(R.id.tv_topic_list_item, topicItem.getName());
+                    holder.setText(R.id.tv_topic_list_item, topicItem.getName())
+                            .setText(R.id.tv_topic_list_subitem, topicItem.getDescription());
 //                        .setImageResource(R.id.iv_topic_list_item, R.drawable.ic_star_white_24dp);
                 }
             });
@@ -59,20 +59,9 @@ public class TopicTypeMenuFragment extends BaseFragment{
             // 加载菜单theme信息
             case Constant.EVENT_THEMES_LOARD:
                 initMenuItems((ArrayList<ThemeEntity>)event.getParameter());
-//            {
-//                ArrayList<ThemeEntity> list = new ArrayList<ThemeEntity>();
-//                for(int i=0; i<20; i++) {
-//                    list.add(new ThemeEntity(1, "1", "2", 1, "n"));
-//                }
-//                initMenuItems(list);
-//            }
                 break;
             default:break;
         }
     }
-
-//    public void onEvent(ArrayList<ThemeEntity> list){
-//        initMenuItems(list);
-//    }
 
 }

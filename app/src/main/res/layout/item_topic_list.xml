@@ -11,16 +11,34 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:paddingLeft="10dp" />
+        android:paddingLeft="10dp"
+        tools:background="@drawable/ic_star_white_24dp"/>
     <!--android:background="@drawable/ic_star_white_24dp"-->
 
-    <TextView
-        android:id="@+id/tv_topic_list_item"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:paddingLeft="16dp"
-        android:textSize="18sp"
-        tools:text="asdflkj"/>
+        android:paddingLeft="16dp">
+
+        <TextView
+            android:id="@+id/tv_topic_list_item"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left"
+            android:textSize="18sp"
+            tools:text="asdflkj"/>
+
+        <TextView
+            android:id="@+id/tv_topic_list_subitem"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left"
+            android:textColor="@android:color/darker_gray"
+            android:textSize="10sp"
+            tools:text="asdflkj"/>
+
+    </LinearLayout>
 
 </LinearLayout>

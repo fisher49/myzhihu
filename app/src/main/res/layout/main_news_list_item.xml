@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginBottom="8dp"
+    android:layout_marginLeft="10dp"
+    android:layout_marginRight="10dp"
+    android:layout_marginTop="8dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/tv_news_date"
+        android:textSize="13sp"
+        android:gravity="left"
+        android:layout_marginLeft="5dp"
+        android:layout_marginTop="6dp"
+        android:textColor="@color/Gray600"
+        tools:text="今日新闻"/><!--android:visibility="gone"-->
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:background="@android:color/white"
+        android:orientation="horizontal">
+
+        <com.facebook.drawee.view.SimpleDraweeView
+            android:id="@+id/sdv_thumbnail"
+            android:layout_width="80dp"
+            android:layout_height="70dp"
+            tools:background="@mipmap/start"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:scaleType="fitXY"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/tv_news_summary"
+            android:textSize="18sp"
+            android:layout_alignParentLeft="true"
+            android:layout_toLeftOf="@id/sdv_thumbnail"
+            android:padding="5dp"
+            tools:text="导演卡梅隆的团队打造出万米的深潜器，怎么中国只能达到七千？"/>
+
+
+    </RelativeLayout>
+
+</FrameLayout>

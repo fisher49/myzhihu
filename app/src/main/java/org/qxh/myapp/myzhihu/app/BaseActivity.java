@@ -54,7 +54,9 @@ public class BaseActivity extends AppCompatActivity {
         BaseFragment fragment;
         for(int i=0; i<args.length; i++){
             fragment = (BaseFragment)getFragmentManager().findFragmentById(args[i]);
-            fragment.onEventMainThread(event);
+            if(fragment != null) {
+                fragment.onEventMainThread(event);
+            }
         }
     }
 }
