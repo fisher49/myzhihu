@@ -6,8 +6,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.qxh.myapp.myzhihu.config.Constant;
-import org.qxh.myapp.myzhihu.model.db.CacheDbHelper;
-import org.qxh.myapp.myzhihu.model.db.CacheDbOperator;
+import org.qxh.myapp.myzhihu.model.db.CacheOperator;
 import org.qxh.myapp.myzhihu.model.entities.LatestNewsEntity;
 import org.qxh.myapp.myzhihu.model.entities.StoriesEntity;
 import org.qxh.myapp.myzhihu.model.entities.TopStoriesEntity;
@@ -21,26 +20,32 @@ import java.util.List;
  */
 public class LatestNewsUsecase {
     private Context context;
-    private CacheDbHelper helper;
-    private CacheDbOperator dbOperator;
+//    private CacheDbHelper helper;
+    private CacheOperator dbOperator;
 
     public LatestNewsUsecase(Context context) {
         this.context = context;
-        helper = new CacheDbHelper(context);
-        dbOperator = new CacheDbOperator(helper.getWritableDatabase());
+//        helper = new CacheDbHelper(context);
+        dbOperator = new CacheOperator();
     }
 
     public boolean parseLatestNewsJson(String json, LatestNewsEntity latestNewsEntity){
         try {
             if(json.length() > 0) {
+                List<StoriesEntity> storiesEntities = new ArrayList<>();
+                List<TopStoriesEntity> topStoriesEntities = new ArrayList<>();
                 JSONObject jsonObject = new JSONObject(json);
                 String date = jsonObject.getString(Constant.JSON_TAG_DATE);
 
                 JSONArray jsonArray = jsonObject.getJSONArray(Constant.JSON_TAG_STORIES);
-                parseStories(jsonArray, latestNewsEntity.getStories());
+                parseStories(jsonArray, storiesEntities);
 
                 JSONArray jsonArrayTop = jsonObject.getJSONArray(Constant.JSON_TAG_TOP_STORIES);
-                parseTopStories(jsonArrayTop, latestNewsEntity.getTop_stories());
+                parseTopStories(jsonArrayTop, topStoriesEntities);
+
+                latestNewsEntity.setStories(storiesEntities);
+                latestNewsEntity.setTop_stories(topStoriesEntities);
+                latestNewsEntity.setDate(date);
 
                 return true;
             }else {
@@ -88,10 +93,12 @@ public class LatestNewsUsecase {
                 JSONArray jsonArrayImages = jsonStory.getJSONArray(Constant.JSON_TAG_IMAGES);
                 List<String> listImages = new ArrayList<String>();
                 for (int j=0; j<jsonArrayImages.length(); j++){
-                    listImages.add(jsonArrayImages.getString(i));
+                    listImages.add(jsonArrayImages.getString(j));
                 }
 
-                stories.add(new StoriesEntity(jsonStory.getInt(Constant.JSON_TAG_TYPE),
+                int type = (0==i) ? Constant.TYPE_DATE_NEWS_FIRST : Constant.TYPE_DATE_NEWS_DEFAULT;
+
+                stories.add(new StoriesEntity(/*jsonStory.getInt(Constant.JSON_TAG_TYPE)*/ type,
                         jsonStory.getInt(Constant.JSON_TAG_ID),
                         jsonStory.getString(Constant.JSON_TAG_GA_PREFIX),
                         jsonStory.getString(Constant.JSON_TAG_TITLE), listImages));

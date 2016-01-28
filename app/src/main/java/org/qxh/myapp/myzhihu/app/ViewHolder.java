@@ -2,15 +2,19 @@ package org.qxh.myapp.myzhihu.app;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.net.Uri;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.facebook.drawee.view.SimpleDraweeView;
+
+import org.qxh.myapp.myzhihu.R;
 
 /**
  * Created by QXH on 2016/1/23.
@@ -75,6 +79,28 @@ public class ViewHolder {
     public ViewHolder setText(int viewId,String text){
         TextView tv =getView(viewId);
         tv.setText(text);
+        return this;
+
+    }
+
+    /**
+     *
+     * @param viewId 资源ID
+     * @param text 内容
+     * @param hide 是否隐藏
+     * @return
+     */
+    public ViewHolder setHeadlineTextExtra(int viewId, String text, boolean hide){
+        TextView tv =getView(viewId);
+        if(hide){
+            ((FrameLayout)tv.getParent()).setBackgroundColor(Color.TRANSPARENT);
+            tv.setVisibility(View.GONE);
+        }else {
+            ((FrameLayout)tv.getParent()).setBackgroundColor(Color.GRAY);
+            tv.setVisibility(View.VISIBLE);
+            tv.setTextColor(Color.BLACK);
+            tv.setText(text);
+        }
         return this;
 
     }

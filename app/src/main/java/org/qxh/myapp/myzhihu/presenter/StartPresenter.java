@@ -57,7 +57,7 @@ public class StartPresenter {
                         if(response.isSuccessful()) {
                             JSONObject jsonObject = new JSONObject(response.body().string());
 
-                            String imageUrl = jsonObject.getString(Constant.JSON_TYPE_START_IMAGE);
+                            String imageUrl = jsonObject.getString(Constant.JSON_TAG_START_IMAGE);
                             try {
                                 httpUtils.getAsyn(imageUrl, new okhttp3.Callback(){
                                     @Override

@@ -26,6 +26,7 @@ public class MainNewsListPresenter {
     public MainNewsListPresenter(Context context) {
         this.context = context;
         httpUtils = HttpUtils.getInstance();
+        usecase = new LatestNewsUsecase(context);
     }
 
     public void downloadNewsRemote(){
@@ -50,13 +51,22 @@ public class MainNewsListPresenter {
         }
     }
 
-    public List<String> getLoacalNewsDate(){
-        return usecase.readLatestNewsDates();
+    public LatestNewsEntity getLocalNews(int index){
+        List<String> dates = getLoacalNewsDate();
+        if((dates != null) && (dates.size() > index)){
+            return usecase.getLocalLatestNews(dates.get(index));
+        }else {
+            return null;
+        }
     }
 
-    public void getLocalNews(String date){
+    public LatestNewsEntity getLocalNews(String date){
         LatestNewsEntity latestNewsEntity;
-        usecase.getLocalLatestNews(date);
+        return usecase.getLocalLatestNews(date);
+    }
+
+    private List<String> getLoacalNewsDate(){
+        return usecase.readLatestNewsDates();
     }
 
     private void onDownloadFailed(){
@@ -70,4 +80,12 @@ public class MainNewsListPresenter {
 
         EventBus.getDefault().post(new EventBody(Constant.EVENT_NEWS_LOARD_SUCCESS, latestNewsEntity));
     }
+
+    /**
+     * 更新主页图片轮播控件
+     * @param topStoriesList 头条新闻信息
+     */
+//    public void updateSlidingPage(List<TopStoriesEntity> topStoriesList) {
+//        EventBus.getDefault().post(new EventBody(Constant.EVENT_SLIDING_PAGE_UPDATE, topStoriesList));
+//    }
 }

@@ -9,6 +9,7 @@ import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewParent;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -26,11 +27,12 @@ import java.util.List;
  */
 public class ViewPageLayout extends FrameLayout implements View.OnClickListener {
     private final int AUTO_PLAY_MILLIS = 5000;
+    private final int START_PLAY_MILLIS = 3000;
     private List<TopStoriesEntity> informations;
     private List<View> views;
     private List<SimpleDraweeView> ls_dot;
     private Context context;
-    private int currentItem;
+    private int currentItem = 0;
     private Handler handler = new Handler();
     private boolean isAutoPlay = false;
     private ViewPager vp_sliding;
@@ -59,7 +61,7 @@ public class ViewPageLayout extends FrameLayout implements View.OnClickListener 
     @Override
     public void onClick(View v) {
         if(itemClickListener != null){
-            itemClickListener.click(v, informations.get(currentItem));
+            itemClickListener.click(v, informations.get(correctPosion(currentItem)));
         }
     }
 
@@ -74,11 +76,12 @@ public class ViewPageLayout extends FrameLayout implements View.OnClickListener 
         initUI();
     }
 
-    public void initUI(){
+    private void initUI(){
         int len = informations.size();
-        View view = LayoutInflater.from(context).inflate(R.layout.view_pages_layout, null);
+        View view = LayoutInflater.from(context).inflate(R.layout.view_pages_layout, this, true);
         LinearLayout ll_dot = (LinearLayout) view.findViewById(R.id.ll_dot);
         vp_sliding = (ViewPager)view.findViewById(R.id.vp_sliding);
+        ls_dot = new ArrayList<>();
 
         ll_dot.removeAllViews();
         for(int i=0; i<len; i++){
@@ -87,6 +90,7 @@ public class ViewPageLayout extends FrameLayout implements View.OnClickListener 
                     LinearLayout.LayoutParams.WRAP_CONTENT);
             params.leftMargin = 5;
             params.rightMargin = 5;
+            simpleDraweeView.setBackgroundResource((0==i) ? R.drawable.dot_focus : R.drawable.dot_blur);
             ll_dot.addView(simpleDraweeView, params);
             ls_dot.add(simpleDraweeView);
         }
@@ -116,7 +120,7 @@ public class ViewPageLayout extends FrameLayout implements View.OnClickListener 
 
     private void startAutoPlay() {
         isAutoPlay = true;
-        handler.postDelayed(task, AUTO_PLAY_MILLIS);
+        handler.postDelayed(task, START_PLAY_MILLIS);
     }
 
     private final Runnable task = new Runnable() {
@@ -124,8 +128,10 @@ public class ViewPageLayout extends FrameLayout implements View.OnClickListener 
         @Override
         public void run() {
             if(isAutoPlay){
-                vp_sliding.setCurrentItem(currentItem);
-                currentItem = (currentItem+1) % informations.size();
+                if(views.size() > 0) {
+                    vp_sliding.setCurrentItem(currentItem+1);
+//                    currentItem = (currentItem + 1) % views.size();
+                }
                 handler.postDelayed(task, AUTO_PLAY_MILLIS);
             }else {
                 handler.postDelayed(task, AUTO_PLAY_MILLIS);
@@ -138,7 +144,8 @@ public class ViewPageLayout extends FrameLayout implements View.OnClickListener 
 
         @Override
         public int getCount() {
-            return informations.size();
+//            return views.size();
+            return Integer.MAX_VALUE;
         }
 
         @Override
@@ -149,25 +156,31 @@ public class ViewPageLayout extends FrameLayout implements View.OnClickListener 
         @Override
         public Object instantiateItem(ViewGroup container, int position) {
 //            return super.instantiateItem(container, position);
-            int realIndex;
-            int size = informations.size();
-            View view = null;
-            if(position < 0){
-                position = 0 - position;
+            View view = views.get(correctPosion(position));
+            // 如果View已经在之前添加到了一个父组件，则必须先remove，否则会抛出IllegalStateException。
+            ViewParent parent = view.getParent();
+            if(parent != null){
+                ((ViewGroup)parent).removeView(view);
             }
-            realIndex = position % size;
 
-            if(realIndex < size) {
-                view = views.get(realIndex);
-                container.addView(view);
-            }
+            container.addView(view);
             return view;
         }
 
         @Override
         public void destroyItem(ViewGroup container, int position, Object object) {
-//            super.destroyItem(container, position, object);
-            container.removeView((View) object);
+            //在instantiateItem()方法中已经处理了remove的逻辑，因此这里并不需要处理
+        }
+    }
+
+    private int correctPosion(int position){
+        if(views.size() > 0) {
+            if (position < 0) {
+                position = 0 - position;
+            }
+            return position % views.size();
+        }else {
+            return 0;
         }
     }
 
@@ -180,12 +193,15 @@ public class ViewPageLayout extends FrameLayout implements View.OnClickListener 
 
         @Override
         public void onPageSelected(int position) {
-            isAutoPlay = false;
-            for(int i=0; i<informations.size(); i++){
-                if(i == currentItem){
-                    ls_dot.get(position).setBackgroundResource(R.drawable.dot_focus);
+//            isAutoPlay = false;
+            int realPosition = correctPosion(position);
+            currentItem = position;
+
+            for(int i=0; i<views.size(); i++){
+                if(i == realPosition){
+                    ls_dot.get(i).setBackgroundResource(R.drawable.dot_focus);
                 }else {
-                    ls_dot.get(position).setBackgroundResource(R.drawable.dot_blur);
+                    ls_dot.get(i).setBackgroundResource(R.drawable.dot_blur);
                 }
             }
         }
@@ -194,14 +210,12 @@ public class ViewPageLayout extends FrameLayout implements View.OnClickListener 
         public void onPageScrollStateChanged(int state) {
             switch (state){
                 case ViewPager.SCROLL_STATE_IDLE:
-                    currentItem = 0;
                     isAutoPlay = true;
                     break;
                 case ViewPager.SCROLL_STATE_DRAGGING:
                     isAutoPlay = false;
                     break;
                 case ViewPager.SCROLL_STATE_SETTLING:
-                    isAutoPlay = true;
                     break;
                 default:break;
             }

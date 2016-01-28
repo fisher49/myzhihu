@@ -39,15 +39,8 @@
                 <!--<com.facebook.drawee.view.SimpleDraweeView-->
                     <!--android:layout_width="300dp"-->
                     <!--android:layout_height="300dp"-->
-                    <!--android:id="@+id/sdv_view"-->
-                    <!--android:layout_gravity="center" />-->
-
-                <!--<Button-->
-                    <!--android:layout_width="wrap_content"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:text="New_Button"-->
-                    <!--android:id="@+id/button"-->
-                    <!--android:layout_gravity="center_horizontal|bottom" />-->
+                    <!--android:id="@+id/sdv_image123"-->
+                    <!--android:scaleType="centerCrop"/>-->
             </FrameLayout>
 
         </android.support.v4.widget.SwipeRefreshLayout>

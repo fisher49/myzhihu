@@ -11,4 +11,5 @@
     <color name="Gray">#888888</color>
     <color name="Gray100">#dddddd</color>
     <color name="Gray600">#999999</color>
+    <color name="BlueGrey900">#263238</color>
 </resources>

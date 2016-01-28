@@ -20,25 +20,22 @@ public class MainActivity extends BaseActivity {
     DrawerLayout drawerlayout;
     FrameLayout fl_topic_list;
     SwipeRefreshLayout srl_topic_list;
-//    Button button;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-//        button = (Button)findViewById(R.id.button);
-//        button.setOnClickListener(new View.OnClickListener(){
-//            @Override
-//            public void onClick(View v) {
-//                SimpleDraweeView view = (SimpleDraweeView)findViewById(R.id.sdv_view);
-//                Uri uri = Uri.parse("http://k.sinaimg.cn/n/sports/transform/20160123/Xzo1-fxnuvxc1695509.jpg/w5702cd.jpg");
-//                view.setImageURI(uri);
-
-//                view.setImageURI(ImageRequest.fromUri("http://p1.gexing.com/G1/M00/45/DB/rBABFFGu9h3ChMDmAAA0vyy1_UA611.jpg"));
-//            }
-//        });
         initView();
     }
+
+//    @Override
+//    protected void onPostCreate(@Nullable Bundle savedInstanceState) {
+//        super.onPostCreate(savedInstanceState);
+//
+//        SimpleDraweeView view = (SimpleDraweeView)findViewById(R.id.sdv_image123);
+//        Uri uri = Uri.parse("http://k.sinaimg.cn/n/sports/transform/20160123/Xzo1-fxnuvxc1695509.jpg/w5702cd.jpg");
+//        view.setImageURI(uri);
+//    }
 
     private void initView(){
         toolbar = (Toolbar) findViewById(R.id.tb_main);
@@ -58,10 +55,15 @@ public class MainActivity extends BaseActivity {
                 srl_topic_list.setRefreshing(false);
             }
         });
+
+        refreshFragment();
     }
 
     private void refreshFragment() {
 //        fl_topic_list.repl
+        // TODO:根据主题类型切换新闻列表
+        getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.slide_in_from_right, R.anim.slide_out_to_left)
+                .replace(R.id.fl_topic_list, new MainNewsListFragment()).commit();
     }
 
     @Override

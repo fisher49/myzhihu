@@ -16,7 +16,7 @@
         android:gravity="left"
         android:layout_marginLeft="5dp"
         android:layout_marginTop="6dp"
-        android:textColor="@color/Gray600"
+        android:textColor="@color/BlueGrey900"
         tools:text="今日新闻"/><!--android:visibility="gone"-->
 
     <RelativeLayout
@@ -24,7 +24,8 @@
         android:layout_height="wrap_content"
         android:padding="10dp"
         android:background="@android:color/white"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        tools:visibility="gone">
 
         <com.facebook.drawee.view.SimpleDraweeView
             android:id="@+id/sdv_thumbnail"
@@ -42,8 +43,8 @@
             android:textSize="18sp"
             android:layout_alignParentLeft="true"
             android:layout_toLeftOf="@id/sdv_thumbnail"
-            android:padding="5dp"
-            tools:text="导演卡梅隆的团队打造出万米的深潜器，怎么中国只能达到七千？"/>
+            android:padding="5dp"/>
+            <!--tools:text="导演卡梅隆的团队打造出万米的深潜器，怎么中国只能达到七千？"/>-->
 
 
     </RelativeLayout>

@@ -11,6 +11,7 @@ public class Constant {
     public static final String THEME_URL = "themes";
     public static final String LATEST_NEWS_URL = "news/latest";
 
+    public static final String JSON_TAG_START_IMAGE = "img";
     public static final String JSON_TAG_OTHERS = "others";
     public static final String JSON_TAG_COLOR = "color";
     public static final String JSON_TAG_THUMBNAIL = "thumbnail";
@@ -34,6 +35,11 @@ public class Constant {
 
     public static final String EVENT_NEWS_LOARD_FAIL = "EvtNews01";
     public static final String EVENT_NEWS_LOARD_SUCCESS = "EvtNews02";
+    public static final String EVENT_NEWS_LOARD_NEWS = "EvtNews03";
 
-    public static final String JSON_TYPE_START_IMAGE = "img";
+    public static final String EVENT_SLIDING_PAGE_UPDATE = "EvtSP01";
+
+
+    public static final int TYPE_DATE_NEWS_DEFAULT = 10001;
+    public static final int TYPE_DATE_NEWS_FIRST = 10002;
 }

@@ -25,6 +25,16 @@ public abstract class CommonAdapter<T> extends BaseAdapter{
 
     }
 
+    public void addList(List<T> list){
+        mDatas.addAll(list);
+        notifyDataSetChanged();
+    }
+
+    public void addList(int location, List<T> list){
+        mDatas.addAll(location, list);
+        notifyDataSetChanged();
+    }
+
     @Override
     public int getCount() {
         // TODO Auto-generated method stub
