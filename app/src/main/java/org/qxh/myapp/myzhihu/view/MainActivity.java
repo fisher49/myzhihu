@@ -8,6 +8,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.FrameLayout;
+import android.widget.Toast;
 
 import org.qxh.myapp.myzhihu.R;
 import org.qxh.myapp.myzhihu.app.BaseActivity;
@@ -16,10 +17,10 @@ import org.qxh.myapp.myzhihu.config.Constant;
 
 public class MainActivity extends BaseActivity {
 
-    Toolbar toolbar;
-    DrawerLayout drawerlayout;
-    FrameLayout fl_topic_list;
-    SwipeRefreshLayout srl_topic_list;
+    private Toolbar toolbar;
+    private DrawerLayout drawerlayout;
+    private FrameLayout fl_topic_list;
+    private SwipeRefreshLayout srl_topic_list;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -60,10 +61,12 @@ public class MainActivity extends BaseActivity {
     }
 
     private void refreshFragment() {
-//        fl_topic_list.repl
-        // TODO:根据主题类型切换新闻列表
+        refreshFragment(Constant.TAG_MAIN_LIST_FRAGMENT_LATEST);
+    }
+
+    private void refreshFragment(String tag) {
         getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.slide_in_from_right, R.anim.slide_out_to_left)
-                .replace(R.id.fl_topic_list, new MainNewsListFragment()).commit();
+                .replace(R.id.fl_topic_list, new MainNewsListFragment(), tag).commit();
     }
 
     @Override
@@ -84,11 +87,34 @@ public class MainActivity extends BaseActivity {
         super.onStart();
     }
 
+    private void enableSwipeRefreshLayout(boolean enable){
+        if(srl_topic_list != null) {
+            srl_topic_list.setEnabled(enable);
+        }
+    }
+
     public void onEventMainThread(EventBody event){
             switch (event.getEventName()) {
                 // 显示图片
                 case Constant.EVENT_START_SHOW_IMAGE_BITMAP:
                     break;
+                // 控制下拉刷新功能开关
+                case Constant.EVENT_MAIN_NEWS_SWITCH_SWIPEREFRESH:
+                    enableSwipeRefreshLayout((boolean)event.getParameter());
+                    break;
+                // 收起侧滑菜单
+                case Constant.EVENT_THEME_CLOSE_MENU:
+                    drawerlayout.closeDrawers();
+                    break;
+                // 加载主题内容结果
+                case Constant.EVENT_MAIN_NEWS_UPDATE_THEME_SUCCESS:
+                    refreshFragment(Constant.TAG_MAIN_LIST_FRAGMENT_THEME);
+                    // TODO:传输ThemeContentEntity初始化main_list_fragment的内容。
+                    break;
+                case Constant.EVENT_MAIN_NEWS_UPDATE_THEME_FAIL:
+                    Toast.makeText(this, getResources().getString(R.string.err_load_theme_content), Toast.LENGTH_SHORT).show();
+                    break;
+
                 default:
                     onSubFragmentEvent(event, R.id.fm_topic_menu, R.id.fl_topic_list);
                     break;

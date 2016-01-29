@@ -5,8 +5,8 @@ import android.content.Context;
 import org.qxh.myapp.myzhihu.app.EventBody;
 import org.qxh.myapp.myzhihu.config.Constant;
 import org.qxh.myapp.myzhihu.model.entities.ThemeEntity;
-import org.qxh.myapp.myzhihu.model.net.HttpUtils;
 import org.qxh.myapp.myzhihu.model.usecase.ThemesUsecase;
+import org.qxh.myapp.myzhihu.utils.Utility;
 
 import java.io.IOException;
 import java.util.List;
@@ -29,7 +29,7 @@ public class TopicTypeMenuPresenter {
 
     public void getTopicInformation(){
 
-        if(HttpUtils.isNetworkConnected(context)) {
+        if(Utility.isNetworkConnected(context)) {
             themesUsecase.requestRemoteThemesSync(new okhttp3.Callback() {
                 @Override
                 public void onFailure(Call call, IOException e) {
@@ -54,5 +54,13 @@ public class TopicTypeMenuPresenter {
 
     private void dealThemesInformation(List<ThemeEntity> themes){
         EventBus.getDefault().post(new EventBody(Constant.EVENT_THEMES_LOARD, themes));
+    }
+
+    public void updateMainlist(int id) {
+        EventBus.getDefault().post(new EventBody(Constant.EVENT_THEME_SELECT, id));
+    }
+
+    public void closeMenu() {
+        EventBus.getDefault().post(new EventBody(Constant.EVENT_THEME_CLOSE_MENU, null));
     }
 }

@@ -7,6 +7,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.qxh.myapp.myzhihu.config.Constant;
 import org.qxh.myapp.myzhihu.model.db.CacheOperator;
+import org.qxh.myapp.myzhihu.model.entities.BeforeNewsEntity;
 import org.qxh.myapp.myzhihu.model.entities.LatestNewsEntity;
 import org.qxh.myapp.myzhihu.model.entities.StoriesEntity;
 import org.qxh.myapp.myzhihu.model.entities.TopStoriesEntity;
@@ -57,6 +58,30 @@ public class LatestNewsUsecase {
         }
     }
 
+    public boolean parseBeforeNewsJson(String json, BeforeNewsEntity beforeNewsEntity){
+        try {
+            if(json.length() > 0) {
+                List<StoriesEntity> storiesEntities = new ArrayList<>();
+//                List<TopStoriesEntity> topStoriesEntities = new ArrayList<>();
+                JSONObject jsonObject = new JSONObject(json);
+                String date = jsonObject.getString(Constant.JSON_TAG_DATE);
+
+                JSONArray jsonArray = jsonObject.getJSONArray(Constant.JSON_TAG_STORIES);
+                parseStories(jsonArray, storiesEntities);
+
+                beforeNewsEntity.setStories(storiesEntities);
+                beforeNewsEntity.setDate(date);
+
+                return true;
+            }else {
+                return false;
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     public void downloadLatestNewsSync(okhttp3.Callback callback){
         try {
             HttpUtils httpUtils = HttpUtils.getInstance();
@@ -67,10 +92,30 @@ public class LatestNewsUsecase {
         }
     }
 
+    public void downloadBeforeNewsSync(String date, okhttp3.Callback callback){
+        try {
+            HttpUtils httpUtils = HttpUtils.getInstance();
+
+            httpUtils.getDefaultUrlAsyn(Constant.LATEST_NEWS_BEFORE_URL+date, callback);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     public LatestNewsEntity getLocalLatestNews(String date){
         String json = dbOperator.findNewsCache(date);
         LatestNewsEntity news = new LatestNewsEntity();
         if(parseLatestNewsJson(json, news)){
+            return news;
+        }else {
+            return null;
+        }
+    }
+
+    public BeforeNewsEntity getLocalBeforeNews(String date){
+        String json = dbOperator.findNewsCache(date);
+        BeforeNewsEntity news = new BeforeNewsEntity();
+        if(parseBeforeNewsJson(json, news)){
             return news;
         }else {
             return null;

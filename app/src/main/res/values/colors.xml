@@ -10,6 +10,22 @@
     <color name="White">#fff</color>
     <color name="Gray">#888888</color>
     <color name="Gray100">#dddddd</color>
+    <color name="Gray200">#eeeeee</color>
+    <color name="Grey300">#e0e0e0</color>
+    <color name="Grey400">#bdbdbd</color>
     <color name="Gray600">#999999</color>
+    <color name="Grey700">#616161</color>
+    <color name="Grey800">#424242</color>
+    <color name="Grey900">#212121</color>
     <color name="BlueGrey900">#263238</color>
+    <color name="Black">#000000</color>
+
+    <color name="main_list_background">@color/Gray200</color>
+    <color name="main_list_date">@color/Grey800</color>
+    <color name="main_list_selector">@color/Grey700</color>
+    <color name="main_list_item_foreground_light">@color/White</color>
+    <color name="main_list_item_foreground_dark">@color/Grey400</color>
+    <color name="main_list_item_background_light">@color/Grey400</color>
+    <color name="main_list_item_background_dark">@color/Grey400</color>
+
 </resources>

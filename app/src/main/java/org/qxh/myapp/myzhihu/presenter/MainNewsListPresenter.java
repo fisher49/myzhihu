@@ -4,9 +4,13 @@ import android.content.Context;
 
 import org.qxh.myapp.myzhihu.app.EventBody;
 import org.qxh.myapp.myzhihu.config.Constant;
+import org.qxh.myapp.myzhihu.model.entities.BeforeNewsEntity;
 import org.qxh.myapp.myzhihu.model.entities.LatestNewsEntity;
+import org.qxh.myapp.myzhihu.model.entities.ThemeContentEntity;
 import org.qxh.myapp.myzhihu.model.net.HttpUtils;
 import org.qxh.myapp.myzhihu.model.usecase.LatestNewsUsecase;
+import org.qxh.myapp.myzhihu.model.usecase.ThemeContentUsecase;
+import org.qxh.myapp.myzhihu.utils.Utility;
 
 import java.io.IOException;
 import java.util.List;
@@ -22,15 +26,18 @@ public class MainNewsListPresenter {
     private HttpUtils httpUtils;
     private Context context;
     private LatestNewsUsecase usecase;
+    private ThemeContentUsecase themeContentUsecase;
+    private int currentId = -1;
 
     public MainNewsListPresenter(Context context) {
         this.context = context;
         httpUtils = HttpUtils.getInstance();
         usecase = new LatestNewsUsecase(context);
+        themeContentUsecase = new ThemeContentUsecase(context);
     }
 
     public void downloadNewsRemote(){
-        if(HttpUtils.isNetworkConnected(context)) {
+        if(Utility.isNetworkConnected(context)) {
             usecase.downloadLatestNewsSync(new okhttp3.Callback() {
                 @Override
                 public void onFailure(Call call, IOException e) {
@@ -51,6 +58,28 @@ public class MainNewsListPresenter {
         }
     }
 
+    public void downloadBeforeNewsRemote(String date){
+        if(Utility.isNetworkConnected(context)) {
+            usecase.downloadBeforeNewsSync(date, new okhttp3.Callback() {
+                @Override
+                public void onFailure(Call call, IOException e) {
+                    onDownloadBeforeFailed();
+                }
+
+                @Override
+                public void onResponse(Call call, Response response) throws IOException {
+                    if (response.isSuccessful()) {
+                        onDownloadBeforeSuccess(response.body().string());
+                    } else {
+                        onDownloadBeforeFailed();
+                    }
+                }
+            });
+        }else {
+            onDownloadBeforeFailed();
+        }
+    }
+
     public LatestNewsEntity getLocalNews(int index){
         List<String> dates = getLoacalNewsDate();
         if((dates != null) && (dates.size() > index)){
@@ -60,13 +89,42 @@ public class MainNewsListPresenter {
         }
     }
 
+    /**
+     * 获取特定日期前一日的消息纪录
+     * @param date 指定日期，查询的是该日期前一日的记录
+     * @return 往日记录
+     */
+    public BeforeNewsEntity getLocalBeforeNews(String date){
+        List<String> dates = getLoacalNewsDate();
+        if(dates.size() > 0) {
+            int pos = dates.indexOf(date);
+            if ((pos >= 0) && (dates.size() > pos+1)) {
+                return usecase.getLocalBeforeNews(dates.get(pos+1));
+            }
+        }
+
+        return null;
+    }
+
     public LatestNewsEntity getLocalNews(String date){
-        LatestNewsEntity latestNewsEntity;
+//        LatestNewsEntity latestNewsEntity;
         return usecase.getLocalLatestNews(date);
     }
 
     private List<String> getLoacalNewsDate(){
         return usecase.readLatestNewsDates();
+    }
+
+    private void onDownloadBeforeFailed(){
+        EventBus.getDefault().post(new EventBody(Constant.EVENT_NEWS_BEFORE_LOARD_FAIL, null));
+    }
+
+    private void onDownloadBeforeSuccess(String json){
+        BeforeNewsEntity beforeNewsEntity = new BeforeNewsEntity();
+        usecase.parseBeforeNewsJson(json, beforeNewsEntity);
+        usecase.saveLatestNewsLocal(beforeNewsEntity.getDate(), json);
+
+        EventBus.getDefault().post(new EventBody(Constant.EVENT_NEWS_BEFORE_LOARD_SUCCESS, beforeNewsEntity));
     }
 
     private void onDownloadFailed(){
@@ -79,6 +137,48 @@ public class MainNewsListPresenter {
         usecase.saveLatestNewsLocal(latestNewsEntity.getDate(), json);
 
         EventBus.getDefault().post(new EventBody(Constant.EVENT_NEWS_LOARD_SUCCESS, latestNewsEntity));
+    }
+
+    public void enableSwipeRefresh(boolean enable) {
+        EventBus.getDefault().post(new EventBody(Constant.EVENT_MAIN_NEWS_SWITCH_SWIPEREFRESH, enable));
+    }
+
+    /**
+     * 获取指定主题下的内容
+     * @param id 主题id
+     * @return
+     */
+    public void getThemeContent(int id) {
+        currentId = id;
+        if(Utility.isNetworkConnected(context)){
+            themeContentUsecase.requestRemoteThemesContentSync(id, new okhttp3.Callback(){
+
+                @Override
+                public void onFailure(Call call, IOException e) {
+                    EventBus.getDefault().post(new EventBody(Constant.EVENT_MAIN_NEWS_UPDATE_THEME_FAIL, null));
+                }
+
+                @Override
+                public void onResponse(Call call, Response response) throws IOException {
+                    if (response.isSuccessful()) {
+                        onDownloadThemeSuccess(currentId, response.body().string());
+                    } else {
+                        EventBus.getDefault().post(new EventBody(Constant.EVENT_MAIN_NEWS_UPDATE_THEME_FAIL, null));
+                    }
+                }
+            });
+
+        }else {
+            ThemeContentEntity entity = themeContentUsecase.getLocalThemeContent(id);
+            EventBus.getDefault().post(new EventBody(Constant.EVENT_MAIN_NEWS_UPDATE_THEME_SUCCESS, entity));
+        }
+    }
+
+    private void onDownloadThemeSuccess(int id, String json){
+        ThemeContentEntity entity = themeContentUsecase.parseThemeContentJson(json);
+        themeContentUsecase.saveThemesContentLocal(id, json);
+
+        EventBus.getDefault().post(new EventBody(Constant.EVENT_MAIN_NEWS_UPDATE_THEME_SUCCESS, entity));
     }
 
     /**

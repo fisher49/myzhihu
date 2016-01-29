@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -25,6 +26,7 @@ public class TopicTypeMenuFragment extends BaseFragment{
 
     ListView lv_topic_list;
     TopicTypeMenuPresenter presenter;
+    ArrayList<ThemeEntity> themes;
     @Override
     protected View initView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_topic_type_menu, container, false);
@@ -40,6 +42,7 @@ public class TopicTypeMenuFragment extends BaseFragment{
     private void initMenuItems(ArrayList<ThemeEntity> themes){
 
         if(themes != null) {
+            this.themes = themes;
             lv_topic_list.setAdapter(new CommonAdapter<ThemeEntity>(getActivity(), themes, R.layout.item_topic_list) {
 
                 @Override
@@ -49,8 +52,16 @@ public class TopicTypeMenuFragment extends BaseFragment{
 //                        .setImageResource(R.id.iv_topic_list_item, R.drawable.ic_star_white_24dp);
                 }
             });
+
+            lv_topic_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    presenter.updateMainlist(TopicTypeMenuFragment.this.themes.get(position).getId());
+                    presenter.closeMenu();
+                }
+            });
         }else {
-            Toast.makeText(getActivity(), R.string.err_loard_themes, Toast.LENGTH_LONG).show();
+            Toast.makeText(getActivity(), R.string.err_load_themes, Toast.LENGTH_LONG).show();
         }
     }
 

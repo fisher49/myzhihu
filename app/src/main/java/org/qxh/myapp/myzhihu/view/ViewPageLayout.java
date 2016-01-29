@@ -145,7 +145,11 @@ public class ViewPageLayout extends FrameLayout implements View.OnClickListener 
         @Override
         public int getCount() {
 //            return views.size();
-            return Integer.MAX_VALUE;
+            if(views.size() > 0) {
+                return Integer.MAX_VALUE;
+            }else {
+                return 0;
+            }
         }
 
         @Override

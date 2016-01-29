@@ -65,7 +65,7 @@ public class CacheOperator {
     public List<String> readAllDateRecordNewsCache(){
         SQLiteDatabase db = manager.openDadabase();
         List<String> dates = null;
-        String sql = "SELECT DATE FROM " + TABLE_NEWS + " ORDER BY DATE ASC";
+        String sql = "SELECT DATE FROM " + TABLE_NEWS + " ORDER BY DATE DESC";
         Cursor result = db.rawQuery(sql, null);
         if(result.getCount() > 0) {
             dates = new ArrayList<String>();

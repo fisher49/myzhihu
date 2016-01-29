@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -14,10 +15,12 @@ import org.qxh.myapp.myzhihu.app.CommonAdapter;
 import org.qxh.myapp.myzhihu.app.EventBody;
 import org.qxh.myapp.myzhihu.app.ViewHolder;
 import org.qxh.myapp.myzhihu.config.Constant;
+import org.qxh.myapp.myzhihu.model.entities.BeforeNewsEntity;
 import org.qxh.myapp.myzhihu.model.entities.LatestNewsEntity;
 import org.qxh.myapp.myzhihu.model.entities.StoriesEntity;
 import org.qxh.myapp.myzhihu.model.entities.TopStoriesEntity;
 import org.qxh.myapp.myzhihu.presenter.MainNewsListPresenter;
+import org.qxh.myapp.myzhihu.utils.Utility;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,8 +35,9 @@ public class MainNewsListFragment extends BaseFragment{
     private List<StoriesEntity> storiesList;
     private List<TopStoriesEntity> topStoriesList;
     private NewsListAdapter adapter;
-    private int currentShowItems = 0;
     private ViewPageLayout viewPage;
+    private String earliestDate;
+    private boolean isLoading = false;
     @Override
     protected View initView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_main_news_list, null);
@@ -44,11 +48,11 @@ public class MainNewsListFragment extends BaseFragment{
         storiesList = new ArrayList<StoriesEntity>();
         topStoriesList = new ArrayList<TopStoriesEntity>();
         // 从本地缓存读取新闻
-        currentShowItems = 0;
-        LatestNewsEntity latestNewsEntity = presenter.getLocalNews(currentShowItems);
+        LatestNewsEntity latestNewsEntity = presenter.getLocalNews(0);
         if(latestNewsEntity != null){
             storiesList.addAll(latestNewsEntity.getStories());
             topStoriesList.addAll(latestNewsEntity.getTop_stories());
+            earliestDate = latestNewsEntity.getDate();
         }else {
             presenter.downloadNewsRemote();
         }
@@ -67,6 +71,26 @@ public class MainNewsListFragment extends BaseFragment{
 
         adapter = new NewsListAdapter(mActivity, storiesList, R.layout.main_news_list_item);
         lv_news.setAdapter(adapter);
+        lv_news.setOnScrollListener(new AbsListView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(AbsListView view, int scrollState) {
+
+            }
+
+            @Override
+            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+                if (lv_news != null && lv_news.getChildCount() > 0) {
+                    boolean enable = (firstVisibleItem == 0) && (view.getChildAt(firstVisibleItem).getTop() == 0);
+                    presenter.enableSwipeRefresh(enable);
+                }
+
+                if((firstVisibleItem+visibleItemCount == totalItemCount)
+                        && (totalItemCount != 0) && !isLoading){
+                    isLoading = true;
+                    presenter.downloadBeforeNewsRemote(earliestDate);
+                }
+            }
+        });
         return view;
     }
 
@@ -81,7 +105,10 @@ public class MainNewsListFragment extends BaseFragment{
             holder.setText(R.id.tv_news_summary, storiesEntity.getTitle())
                     .setDraweeImageURL(R.id.sdv_thumbnail, storiesEntity.getImages().get(0));
             if(storiesEntity.getType() == Constant.TYPE_DATE_NEWS_FIRST){
-                holder.setHeadlineTextExtra(R.id.tv_news_date, getResources().getString(R.string.tv_today_news), false);
+                holder.setHeadlineTextExtra(R.id.tv_news_date,
+                        (0 == mDatas.indexOf(storiesEntity)) ? getResources().getString(R.string.tv_today_news)
+                                : Utility.formatYYYYMMDDDate(earliestDate),
+                        false);
             }else {
                 holder.setHeadlineTextExtra(R.id.tv_news_date, null, true);
             }
@@ -91,28 +118,66 @@ public class MainNewsListFragment extends BaseFragment{
     private void updateNewListView(LatestNewsEntity latestNewsEntity) {
         topStoriesList.clear();
         topStoriesList.addAll(latestNewsEntity.getTop_stories());
-//        presenter.updateSlidingPage(topStoriesList);
         viewPage.setTopEntities(topStoriesList);
         viewPage.invalidate();
 
         adapter.addList(0, latestNewsEntity.getStories());
     }
 
+    private void updateBeforeNewListView(BeforeNewsEntity beforeNewsEntity) {
+        earliestDate = beforeNewsEntity.getDate();
+        adapter.addList(beforeNewsEntity.getStories());
+        isLoading = false;
+    }
+
+    private void onDownloadBeforeNewsFailed(){
+        BeforeNewsEntity beforeNewsEntity = presenter.getLocalBeforeNews(earliestDate);
+        if(beforeNewsEntity != null){
+            earliestDate = beforeNewsEntity.getDate();
+            adapter.addList(beforeNewsEntity.getStories());
+        }else {
+            Toast.makeText(mActivity, R.string.err_load_before, Toast.LENGTH_SHORT).show();
+        }
+
+        isLoading = false;
+    }
+
+    private void updateThemeContent(int id) {
+        presenter.getThemeContent(id);
+    }
+
     public void onEventMainThread(EventBody event){
         switch (event.getEventName()){
+            // 加载今日新闻结果
             case Constant.EVENT_NEWS_LOARD_SUCCESS:
                 updateNewListView((LatestNewsEntity)event.getParameter());
                 break;
             case Constant.EVENT_NEWS_LOARD_FAIL:
-//                updateNewListView((LatestNewsEntity)event.getParameter());
                 Toast.makeText(mActivity, R.string.err_connect, Toast.LENGTH_SHORT).show();
                 break;
+
+            // 加载过往新闻结果
+            case Constant.EVENT_NEWS_BEFORE_LOARD_FAIL:
+                onDownloadBeforeNewsFailed();
+                break;
+            case Constant.EVENT_NEWS_BEFORE_LOARD_SUCCESS:
+                updateBeforeNewListView((BeforeNewsEntity)event.getParameter());
+                break;
+
+            // 选中主题并加载内容
+            case Constant.EVENT_THEME_SELECT:
+                updateThemeContent((int)event.getParameter());
+                break;
+            // 根据主题内容初始化列表
+            case Constant.EVENT_MAIN_UPDATE_THEME:
+                // TODO:初始化列表内容
+                break;
+
             case Constant.EVENT_NEWS_LOARD_NEWS:
                 presenter.downloadNewsRemote();
                 break;
             default:break;
         }
     }
-
 
 }

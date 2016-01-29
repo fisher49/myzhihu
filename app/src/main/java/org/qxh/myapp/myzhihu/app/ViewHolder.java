@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.facebook.drawee.view.SimpleDraweeView;
@@ -23,6 +24,7 @@ public class ViewHolder {
     private SparseArray<View> mViews;
     private int mPositon;
     private View mConvertView;
+    private Context context;
 
     public ViewHolder(Context context, ViewGroup parent, int layoutId,
                       int position) {
@@ -32,7 +34,7 @@ public class ViewHolder {
                 false);
 
         mConvertView.setTag(this);
-
+        this.context = context;
     }
 
     public static ViewHolder get(Context context, View convertView,
@@ -93,12 +95,12 @@ public class ViewHolder {
     public ViewHolder setHeadlineTextExtra(int viewId, String text, boolean hide){
         TextView tv =getView(viewId);
         if(hide){
-            ((FrameLayout)tv.getParent()).setBackgroundColor(Color.TRANSPARENT);
+//            ((LinearLayout)tv.getParent()).setBackgroundColor(context.getResources().getColor(R.color.main_list_background, null));
             tv.setVisibility(View.GONE);
         }else {
-            ((FrameLayout)tv.getParent()).setBackgroundColor(Color.GRAY);
+//            ((LinearLayout)tv.getParent()).setBackgroundColor(Color.GRAY);
             tv.setVisibility(View.VISIBLE);
-            tv.setTextColor(Color.BLACK);
+//            tv.setTextColor(context.getResources().getColor(R.color.main_list_date));
             tv.setText(text);
         }
         return this;
