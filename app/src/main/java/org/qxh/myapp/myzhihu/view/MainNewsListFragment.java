@@ -36,26 +36,28 @@ public class MainNewsListFragment extends BaseFragment{
     private List<TopStoriesEntity> topStoriesList;
     private NewsListAdapter adapter;
     private ViewPageLayout viewPage;
-    private String earliestDate;
+//    String latestNewsEntity;
     private boolean isLoading = false;
     @Override
     protected View initView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_main_news_list, null);
         lv_news = (ListView)view.findViewById(R.id.lv_news_list);
 
-        presenter = new MainNewsListPresenter(mActivity);
+        presenter = new MainNewsListPresenter(mActivity, getTag());
 
         storiesList = new ArrayList<StoriesEntity>();
         topStoriesList = new ArrayList<TopStoriesEntity>();
-        // 从本地缓存读取新闻
-        LatestNewsEntity latestNewsEntity = presenter.getLocalNews(0);
-        if(latestNewsEntity != null){
-            storiesList.addAll(latestNewsEntity.getStories());
-            topStoriesList.addAll(latestNewsEntity.getTop_stories());
-            earliestDate = latestNewsEntity.getDate();
-        }else {
-            presenter.downloadNewsRemote();
-        }
+//        // 从本地缓存读取新闻
+//        LatestNewsEntity latestNewsEntity = presenter.getLocalNews(0);
+//        if(latestNewsEntity != null){
+//            storiesList.addAll(latestNewsEntity.getStories());
+//            topStoriesList.addAll(latestNewsEntity.getTop_stories());
+//            earliestDate = latestNewsEntity.getDate();
+//        }else {
+//            presenter.downloadNewsRemote();
+//        }
+//        String tag = getTag();
+        presenter.initListContext();
 
         View listHeader = inflater.inflate(R.layout.view_page, null);
         viewPage = (ViewPageLayout) listHeader.findViewById(R.id.vpl_sliding);
@@ -69,7 +71,7 @@ public class MainNewsListFragment extends BaseFragment{
         });
         lv_news.addHeaderView(listHeader);
 
-        adapter = new NewsListAdapter(mActivity, storiesList, R.layout.main_news_list_item);
+        adapter = new NewsListAdapter(mActivity, storiesList, R.layout.main_news_list_item, null);
         lv_news.setAdapter(adapter);
         lv_news.setOnScrollListener(new AbsListView.OnScrollListener() {
             @Override
@@ -84,7 +86,8 @@ public class MainNewsListFragment extends BaseFragment{
                     presenter.enableSwipeRefresh(enable);
                 }
 
-                if((firstVisibleItem+visibleItemCount == totalItemCount)
+                String earliestDate = MainNewsListFragment.this.adapter.getEarliestDate();
+                if((firstVisibleItem+visibleItemCount == totalItemCount) && (earliestDate != null)
                         && (totalItemCount != 0) && !isLoading){
                     isLoading = true;
                     presenter.downloadBeforeNewsRemote(earliestDate);
@@ -95,9 +98,20 @@ public class MainNewsListFragment extends BaseFragment{
     }
 
     public class NewsListAdapter extends CommonAdapter<StoriesEntity>{
+        // 包含所有列表的日期信息
+        private List<String> dates;
+        // 包含所有当日首条记录在列表中的索引信息
+        private List<Integer> firstItemIndexOfDateList;
 
-        public NewsListAdapter(Context context, List<StoriesEntity> datas, int layoutId) {
+        public NewsListAdapter(Context context, List<StoriesEntity> datas, int layoutId, String date) {
             super(context, datas, layoutId);
+
+            dates = new ArrayList<>();
+            firstItemIndexOfDateList = new ArrayList<>();
+            if(date != null) {
+                dates.add(date);
+                firstItemIndexOfDateList.add(0);
+            }
         }
 
         @Override
@@ -105,14 +119,40 @@ public class MainNewsListFragment extends BaseFragment{
             holder.setText(R.id.tv_news_summary, storiesEntity.getTitle())
                     .setDraweeImageURL(R.id.sdv_thumbnail, storiesEntity.getImages().get(0));
             if(storiesEntity.getType() == Constant.TYPE_DATE_NEWS_FIRST){
-                holder.setHeadlineTextExtra(R.id.tv_news_date,
-                        (0 == mDatas.indexOf(storiesEntity)) ? getResources().getString(R.string.tv_today_news)
-                                : Utility.formatYYYYMMDDDate(earliestDate),
-                        false);
+                int pos = mDatas.indexOf(storiesEntity);
+                if(firstItemIndexOfDateList.contains(pos)) {
+                    holder.setHeadlineTextExtra(R.id.tv_news_date,
+                            (0 == mDatas.indexOf(storiesEntity)) ? getResources().getString(R.string.tv_today_news)
+                                    : Utility.formatYYYYMMDDDate(dates.get(firstItemIndexOfDateList.indexOf(pos))),
+                            false);
+                }else {
+                    holder.setHeadlineTextExtra(R.id.tv_news_date, null, true);
+                }
             }else {
                 holder.setHeadlineTextExtra(R.id.tv_news_date, null, true);
             }
         }
+
+        public void addList(List<StoriesEntity> list, String date){
+            super.addList(list);
+            dates.add(date);
+            firstItemIndexOfDateList.add(mDatas.indexOf(list.get(0)));
+        }
+
+        public void addList(int location, List<StoriesEntity> list, String date){
+            super.addList(location, list);
+            dates.add(location, date);
+            firstItemIndexOfDateList.add(mDatas.indexOf(list.get(0)));
+        }
+
+        public String getEarliestDate(){
+            if((dates != null) && (dates.size() > 0)){
+                return dates.get(dates.size()-1);
+            }else {
+                return null;
+            }
+        }
+
     }
 
     private void updateNewListView(LatestNewsEntity latestNewsEntity) {
@@ -121,21 +161,19 @@ public class MainNewsListFragment extends BaseFragment{
         viewPage.setTopEntities(topStoriesList);
         viewPage.invalidate();
 
-        adapter.addList(0, latestNewsEntity.getStories());
+        adapter.addList(0, latestNewsEntity.getStories(), latestNewsEntity.getDate());
     }
 
     private void updateBeforeNewListView(BeforeNewsEntity beforeNewsEntity) {
-        earliestDate = beforeNewsEntity.getDate();
-        adapter.addList(beforeNewsEntity.getStories());
+        adapter.addList(beforeNewsEntity.getStories(), beforeNewsEntity.getDate());
         isLoading = false;
     }
 
     private void onDownloadBeforeNewsFailed(){
-        BeforeNewsEntity beforeNewsEntity = presenter.getLocalBeforeNews(earliestDate);
-        if(beforeNewsEntity != null){
-            earliestDate = beforeNewsEntity.getDate();
-            adapter.addList(beforeNewsEntity.getStories());
-        }else {
+        BeforeNewsEntity beforeNewsEntity = presenter.getLocalBeforeNews(adapter.getEarliestDate());
+        if (beforeNewsEntity != null) {
+            adapter.addList(beforeNewsEntity.getStories(), beforeNewsEntity.getDate());
+        } else {
             Toast.makeText(mActivity, R.string.err_load_before, Toast.LENGTH_SHORT).show();
         }
 
@@ -173,9 +211,9 @@ public class MainNewsListFragment extends BaseFragment{
                 // TODO:初始化列表内容
                 break;
 
-            case Constant.EVENT_NEWS_LOARD_NEWS:
-                presenter.downloadNewsRemote();
-                break;
+//            case Constant.EVENT_NEWS_LOARD_NEWS:
+//                presenter.downloadNewsRemote();
+//                break;
             default:break;
         }
     }

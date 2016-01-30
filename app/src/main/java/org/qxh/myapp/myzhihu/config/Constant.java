@@ -45,7 +45,7 @@ public class Constant {
 
     public static final String EVENT_NEWS_LOARD_FAIL = "EvtNews01";
     public static final String EVENT_NEWS_LOARD_SUCCESS = "EvtNews02";
-    public static final String EVENT_NEWS_LOARD_NEWS = "EvtNews03";
+//    public static final String EVENT_NEWS_LOARD_NEWS = "EvtNews03";
     public static final String EVENT_NEWS_BEFORE_LOARD_FAIL = "EvtNews04";
     public static final String EVENT_NEWS_BEFORE_LOARD_SUCCESS = "EvtNews05";
 

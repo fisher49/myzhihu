@@ -12,5 +12,5 @@
     <string name="err_load_themes">加载主题失败</string>
     <string name="err_connect">网络连接失败</string>
     <string name="err_load_before">无更多过往信息</string>
-    <string name="err_load_theme_content">接在主题内容失败</string>
+    <string name="err_load_theme_content">加载主题内容失败</string>
 </resources>

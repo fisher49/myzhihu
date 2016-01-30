@@ -28,34 +28,32 @@ public class MainNewsListPresenter {
     private LatestNewsUsecase usecase;
     private ThemeContentUsecase themeContentUsecase;
     private int currentId = -1;
+    private String tag = Constant.TAG_MAIN_LIST_FRAGMENT_LATEST;
 
-    public MainNewsListPresenter(Context context) {
+    public MainNewsListPresenter(Context context, String tag) {
         this.context = context;
+        this.tag = tag;
         httpUtils = HttpUtils.getInstance();
         usecase = new LatestNewsUsecase(context);
         themeContentUsecase = new ThemeContentUsecase(context);
     }
 
     public void downloadNewsRemote(){
-        if(Utility.isNetworkConnected(context)) {
-            usecase.downloadLatestNewsSync(new okhttp3.Callback() {
-                @Override
-                public void onFailure(Call call, IOException e) {
+        usecase.downloadLatestNewsSync(new okhttp3.Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                onDownloadFailed();
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                if (response.isSuccessful()) {
+                    onDownloadSuccess(response.body().string());
+                } else {
                     onDownloadFailed();
                 }
-
-                @Override
-                public void onResponse(Call call, Response response) throws IOException {
-                    if (response.isSuccessful()) {
-                        onDownloadSuccess(response.body().string());
-                    } else {
-                        onDownloadFailed();
-                    }
-                }
-            });
-        }else {
-            onDownloadFailed();
-        }
+            }
+        });
     }
 
     public void downloadBeforeNewsRemote(String date){
@@ -179,6 +177,16 @@ public class MainNewsListPresenter {
         themeContentUsecase.saveThemesContentLocal(id, json);
 
         EventBus.getDefault().post(new EventBody(Constant.EVENT_MAIN_NEWS_UPDATE_THEME_SUCCESS, entity));
+    }
+
+    public void initListContext() {
+        if(tag.equals(Constant.TAG_MAIN_LIST_FRAGMENT_LATEST)){
+            if(Utility.isNetworkConnected(context)) {
+                downloadNewsRemote();
+            }else {
+                getLocalNews(0);
+            }
+        }
     }
 
     /**

@@ -37,6 +37,7 @@ public class ViewPageLayout extends FrameLayout implements View.OnClickListener 
     private boolean isAutoPlay = false;
     private ViewPager vp_sliding;
     private OnItemClickListener itemClickListener = null;
+    private boolean startPlay = false;
 
     public ViewPageLayout(Context context) {
         this(context, null);
@@ -120,7 +121,10 @@ public class ViewPageLayout extends FrameLayout implements View.OnClickListener 
 
     private void startAutoPlay() {
         isAutoPlay = true;
-        handler.postDelayed(task, START_PLAY_MILLIS);
+        if(!startPlay){
+            startPlay = true;
+            handler.postDelayed(task, START_PLAY_MILLIS);
+        }
     }
 
     private final Runnable task = new Runnable() {
