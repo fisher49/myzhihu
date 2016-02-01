@@ -139,6 +139,7 @@ public class ViewHolder {
     public ViewHolder setDraweeImageURL(int viewId,String url){
         SimpleDraweeView view = getView(viewId);
         view.setImageURI(Uri.parse(url));
+        view.setVisibility(View.VISIBLE);
         return this;
     }
 
@@ -151,6 +152,18 @@ public class ViewHolder {
     public ViewHolder setDraweeImageResource(int viewId,int resId){
         SimpleDraweeView view = getView(viewId);
         view.setBackgroundResource(resId);
+        return this;
+    }
+
+    /**
+     * 这是控件是否可见
+     * @param viewId 控件资源ID
+     * @param visible 可见参数
+     * @return
+     */
+    public ViewHolder setViewVisible(int viewId, int visible){
+        View view = getView(viewId);
+        view.setVisibility(visible);
         return this;
     }
 }

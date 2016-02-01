@@ -53,7 +53,7 @@ public class Constant {
     public static final String EVENT_MAIN_NEWS_UPDATE_THEME_FAIL = "EvtMN02";
     public static final String EVENT_MAIN_NEWS_UPDATE_THEME_SUCCESS = "EvtMN03";
 
-    public static final String EVENT_MAIN_UPDATE_THEME = "EvtMain01";
+//    public static final String EVENT_MAIN_UPDATE_LIST = "EvtMain01";
 
     public static final String EVENT_SLIDING_PAGE_UPDATE = "EvtSP01";
 

@@ -43,24 +43,15 @@ public class MainNewsListFragment extends BaseFragment{
         View view = inflater.inflate(R.layout.fragment_main_news_list, null);
         lv_news = (ListView)view.findViewById(R.id.lv_news_list);
 
+        View listHeader = inflater.inflate(R.layout.view_page, null);
+        viewPage = (ViewPageLayout) listHeader.findViewById(R.id.vpl_sliding);
+
         presenter = new MainNewsListPresenter(mActivity, getTag());
 
         storiesList = new ArrayList<StoriesEntity>();
         topStoriesList = new ArrayList<TopStoriesEntity>();
-//        // 从本地缓存读取新闻
-//        LatestNewsEntity latestNewsEntity = presenter.getLocalNews(0);
-//        if(latestNewsEntity != null){
-//            storiesList.addAll(latestNewsEntity.getStories());
-//            topStoriesList.addAll(latestNewsEntity.getTop_stories());
-//            earliestDate = latestNewsEntity.getDate();
-//        }else {
-//            presenter.downloadNewsRemote();
-//        }
-//        String tag = getTag();
-        presenter.initListContext();
 
-        View listHeader = inflater.inflate(R.layout.view_page, null);
-        viewPage = (ViewPageLayout) listHeader.findViewById(R.id.vpl_sliding);
+
         viewPage.setTopEntities(topStoriesList);
         viewPage.setItemClickListener(new ViewPageLayout.OnItemClickListener(){
 
@@ -86,14 +77,19 @@ public class MainNewsListFragment extends BaseFragment{
                     presenter.enableSwipeRefresh(enable);
                 }
 
-                String earliestDate = MainNewsListFragment.this.adapter.getEarliestDate();
-                if((firstVisibleItem+visibleItemCount == totalItemCount) && (earliestDate != null)
-                        && (totalItemCount != 0) && !isLoading){
-                    isLoading = true;
-                    presenter.downloadBeforeNewsRemote(earliestDate);
+                // 在首页新闻状态下可下拉加载过往新闻
+                if(MainNewsListFragment.this.getTag().equals(Constant.TAG_MAIN_LIST_FRAGMENT_LATEST)) {
+                    String earliestDate = MainNewsListFragment.this.adapter.getEarliestDate();
+                    if ((firstVisibleItem + visibleItemCount == totalItemCount) && (earliestDate != null)
+                            && (totalItemCount != 0) && !isLoading) {
+                        isLoading = true;
+                        presenter.downloadBeforeNewsRemote(earliestDate);
+                    }
                 }
             }
         });
+
+        presenter.initListContext();
         return view;
     }
 
@@ -116,8 +112,13 @@ public class MainNewsListFragment extends BaseFragment{
 
         @Override
         public void convert(ViewHolder holder, StoriesEntity storiesEntity) {
-            holder.setText(R.id.tv_news_summary, storiesEntity.getTitle())
-                    .setDraweeImageURL(R.id.sdv_thumbnail, storiesEntity.getImages().get(0));
+            holder.setText(R.id.tv_news_summary, storiesEntity.getTitle());
+            if(storiesEntity.getImages() != null) {
+                holder.setDraweeImageURL(R.id.sdv_thumbnail, storiesEntity.getImages().get(0));
+//                holder.setViewVisible(R.id.sdv_thumbnail, View.VISIBLE);
+            }else {
+                holder.setViewVisible(R.id.sdv_thumbnail, View.GONE);
+            }
             if(storiesEntity.getType() == Constant.TYPE_DATE_NEWS_FIRST){
                 int pos = mDatas.indexOf(storiesEntity);
                 if(firstItemIndexOfDateList.contains(pos)) {
@@ -180,9 +181,9 @@ public class MainNewsListFragment extends BaseFragment{
         isLoading = false;
     }
 
-    private void updateThemeContent(int id) {
-        presenter.getThemeContent(id);
-    }
+//    private void updateThemeContent(int id) {
+//        presenter.getThemeContent(id);
+//    }
 
     public void onEventMainThread(EventBody event){
         switch (event.getEventName()){
@@ -202,20 +203,17 @@ public class MainNewsListFragment extends BaseFragment{
                 updateBeforeNewListView((BeforeNewsEntity)event.getParameter());
                 break;
 
-            // 选中主题并加载内容
-            case Constant.EVENT_THEME_SELECT:
-                updateThemeContent((int)event.getParameter());
+            // 加载主题内容结果
+            case Constant.EVENT_MAIN_NEWS_UPDATE_THEME_SUCCESS:
+                updateNewListView((LatestNewsEntity)event.getParameter());
                 break;
-            // 根据主题内容初始化列表
-            case Constant.EVENT_MAIN_UPDATE_THEME:
-                // TODO:初始化列表内容
+            case Constant.EVENT_MAIN_NEWS_UPDATE_THEME_FAIL:
+                Toast.makeText(mActivity, getResources().getString(R.string.err_load_theme_content), Toast.LENGTH_SHORT).show();
                 break;
-
-//            case Constant.EVENT_NEWS_LOARD_NEWS:
-//                presenter.downloadNewsRemote();
-//                break;
             default:break;
         }
     }
+
+
 
 }

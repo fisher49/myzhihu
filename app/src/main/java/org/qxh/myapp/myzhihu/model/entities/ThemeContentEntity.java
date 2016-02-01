@@ -174,6 +174,9 @@ public class ThemeContentEntity {
         private String avatar;
         private String name;
 
+        public EditorsEntity() {
+        }
+
         public EditorsEntity(String url, String bio, int id, String avatar, String name) {
             this.url = url;
             this.bio = bio;

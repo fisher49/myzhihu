@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.qxh.myapp.myzhihu.R;
@@ -27,14 +28,24 @@ public class TopicTypeMenuFragment extends BaseFragment{
     ListView lv_topic_list;
     TopicTypeMenuPresenter presenter;
     ArrayList<ThemeEntity> themes;
+    TextView tv_home_page;
     @Override
     protected View initView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_topic_type_menu, container, false);
 
         lv_topic_list = (ListView)view.findViewById(R.id.lv_topic_list);
+        tv_home_page = (TextView)view.findViewById(R.id.tv_home_page);
 
         presenter = new TopicTypeMenuPresenter(getActivity());
         presenter.getTopicInformation();
+
+        tv_home_page.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                presenter.updateMainList(Constant.TAG_MAIN_LIST_FRAGMENT_LATEST, getResources().getString(R.string.app_name));
+                presenter.closeMenu();
+            }
+        });
 
         return view;
     }
@@ -56,7 +67,8 @@ public class TopicTypeMenuFragment extends BaseFragment{
             lv_topic_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    presenter.updateMainlist(TopicTypeMenuFragment.this.themes.get(position).getId());
+                    ThemeEntity entity = TopicTypeMenuFragment.this.themes.get(position);
+                    presenter.updateMainList(String.valueOf(entity.getId()), entity.getName());
                     presenter.closeMenu();
                 }
             });

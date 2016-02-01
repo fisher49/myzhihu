@@ -72,13 +72,14 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:id="@+id/tv_home_page"
         android:paddingBottom="6dp"
         android:paddingTop="6dp"
         android:text="@string/tv_home_page"
         android:textColor="@android:color/holo_blue_dark"
         android:gravity="center"
         android:textSize="20sp"
-        android:background="#ede7e7"/>
+        android:background="@drawable/topic_list_first_item_selector"/>
     <ListView
         android:id="@+id/lv_topic_list"
         android:layout_width="match_parent"

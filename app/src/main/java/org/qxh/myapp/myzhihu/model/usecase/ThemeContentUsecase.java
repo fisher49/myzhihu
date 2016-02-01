@@ -42,10 +42,13 @@ public class ThemeContentUsecase {
                 for(int i=0; i<jsonArray.length(); i++){
                     JSONObject jsonStories = jsonArray.getJSONObject(i);
 
-                    JSONArray jsonArrayImages = jsonStories.getJSONArray(Constant.JSON_TAG_IMAGES);
-                    List<String> images = new ArrayList<>();
-                    for(int j=0; j<jsonArrayImages.length(); j++){
-                        images.add(jsonArrayImages.getString(j));
+                    List<String> images = null;
+                    if(jsonStories.has(Constant.JSON_TAG_IMAGES)) {
+                        JSONArray jsonArrayImages = jsonStories.getJSONArray(Constant.JSON_TAG_IMAGES);
+                        images = new ArrayList<>();
+                        for (int j = 0; j < jsonArrayImages.length(); j++) {
+                            images.add(jsonArrayImages.getString(j));
+                        }
                     }
                     stories.add(new ThemeContentEntity.StoriesEntity(jsonStories.getInt(Constant.JSON_TAG_TYPE),
                             jsonStories.getInt(Constant.JSON_TAG_ID),
@@ -57,11 +60,15 @@ public class ThemeContentUsecase {
                 List<ThemeContentEntity.EditorsEntity> editors = new ArrayList<>();
                 for(int i=0; i<jsonArray2.length(); i++){
                     JSONObject jsonStories = jsonArray2.getJSONObject(i);
-                    editors.add(new ThemeContentEntity.EditorsEntity(jsonStories.getString(Constant.JSON_TAG_URL),
-                            jsonStories.getString(Constant.JSON_TAG_BIO),
-                            jsonStories.getInt(Constant.JSON_TAG_ID),
-                            jsonStories.getString(Constant.JSON_TAG_AVATAR),
-                            jsonStories.getString(Constant.JSON_TAG_NAME)));
+                    // TODO:这里json不一定含有以下tag的所有内容需要容错处理
+//                    editors.add(new ThemeContentEntity.EditorsEntity(jsonStories.getString(Constant.JSON_TAG_URL),
+//                            jsonStories.getString(Constant.JSON_TAG_BIO),
+//                            jsonStories.getInt(Constant.JSON_TAG_ID),
+//                            jsonStories.getString(Constant.JSON_TAG_AVATAR),
+//                            jsonStories.getString(Constant.JSON_TAG_NAME)));
+
+                    // 暂不使用该部分内容
+                    editors.add(new ThemeContentEntity.EditorsEntity());
                 }
 
                 content.setStories(stories);

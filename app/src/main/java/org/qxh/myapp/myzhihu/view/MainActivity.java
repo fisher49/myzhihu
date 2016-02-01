@@ -8,12 +8,13 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.FrameLayout;
-import android.widget.Toast;
 
 import org.qxh.myapp.myzhihu.R;
 import org.qxh.myapp.myzhihu.app.BaseActivity;
 import org.qxh.myapp.myzhihu.app.EventBody;
+import org.qxh.myapp.myzhihu.app.TopicStruct;
 import org.qxh.myapp.myzhihu.config.Constant;
+import org.qxh.myapp.myzhihu.presenter.MainPresenter;
 
 public class MainActivity extends BaseActivity {
 
@@ -21,10 +22,13 @@ public class MainActivity extends BaseActivity {
     private DrawerLayout drawerlayout;
     private FrameLayout fl_topic_list;
     private SwipeRefreshLayout srl_topic_list;
+    private MainPresenter presenter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        presenter = new MainPresenter(this, Constant.TAG_MAIN_LIST_FRAGMENT_LATEST);
 
         initView();
     }
@@ -61,7 +65,7 @@ public class MainActivity extends BaseActivity {
     }
 
     private void refreshFragment() {
-        refreshFragment(Constant.TAG_MAIN_LIST_FRAGMENT_LATEST);
+        refreshFragment(presenter.getTag());
     }
 
     private void refreshFragment(String tag) {
@@ -93,6 +97,12 @@ public class MainActivity extends BaseActivity {
         }
     }
 
+    private void updateThemeContent(TopicStruct topic){
+        refreshFragment(topic.getTag());
+        presenter.setTag(topic.getTag());
+        toolbar.setTitle(topic.getName());
+    }
+
     public void onEventMainThread(EventBody event){
             switch (event.getEventName()) {
                 // 显示图片
@@ -106,13 +116,9 @@ public class MainActivity extends BaseActivity {
                 case Constant.EVENT_THEME_CLOSE_MENU:
                     drawerlayout.closeDrawers();
                     break;
-                // 加载主题内容结果
-                case Constant.EVENT_MAIN_NEWS_UPDATE_THEME_SUCCESS:
-                    refreshFragment(Constant.TAG_MAIN_LIST_FRAGMENT_THEME);
-                    // TODO:传输ThemeContentEntity初始化main_list_fragment的内容。
-                    break;
-                case Constant.EVENT_MAIN_NEWS_UPDATE_THEME_FAIL:
-                    Toast.makeText(this, getResources().getString(R.string.err_load_theme_content), Toast.LENGTH_SHORT).show();
+                // 选中主题并加载内容
+                case Constant.EVENT_THEME_SELECT:
+                    updateThemeContent((TopicStruct)event.getParameter());
                     break;
 
                 default:

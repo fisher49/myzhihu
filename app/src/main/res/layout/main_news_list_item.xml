@@ -52,6 +52,7 @@
                 android:layout_alignParentLeft="true"
                 android:layout_toLeftOf="@id/sdv_thumbnail"
                 android:padding="5dp"
+                android:textColor="@android:color/black"
                 tools:text="导演卡梅隆的团队打造出万米的深潜器，怎么中国只能达到七千？"/>
 
 

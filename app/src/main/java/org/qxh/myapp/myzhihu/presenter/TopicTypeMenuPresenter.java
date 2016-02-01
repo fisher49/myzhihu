@@ -3,6 +3,7 @@ package org.qxh.myapp.myzhihu.presenter;
 import android.content.Context;
 
 import org.qxh.myapp.myzhihu.app.EventBody;
+import org.qxh.myapp.myzhihu.app.TopicStruct;
 import org.qxh.myapp.myzhihu.config.Constant;
 import org.qxh.myapp.myzhihu.model.entities.ThemeEntity;
 import org.qxh.myapp.myzhihu.model.usecase.ThemesUsecase;
@@ -56,8 +57,12 @@ public class TopicTypeMenuPresenter {
         EventBus.getDefault().post(new EventBody(Constant.EVENT_THEMES_LOARD, themes));
     }
 
-    public void updateMainlist(int id) {
-        EventBus.getDefault().post(new EventBody(Constant.EVENT_THEME_SELECT, id));
+//    public void updateMainlist(int id) {
+//        EventBus.getDefault().post(new EventBody(Constant.EVENT_THEME_SELECT, id));
+//    }
+    public void updateMainList(String tag, String name) {
+        TopicStruct topic = new TopicStruct(tag, name);
+        EventBus.getDefault().post(new EventBody(Constant.EVENT_THEME_SELECT, topic));
     }
 
     public void closeMenu() {

@@ -85,15 +85,18 @@ public class ViewPageLayout extends FrameLayout implements View.OnClickListener 
         ls_dot = new ArrayList<>();
 
         ll_dot.removeAllViews();
-        for(int i=0; i<len; i++){
-            SimpleDraweeView simpleDraweeView = new SimpleDraweeView(context);
-            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT);
-            params.leftMargin = 5;
-            params.rightMargin = 5;
-            simpleDraweeView.setBackgroundResource((0==i) ? R.drawable.dot_focus : R.drawable.dot_blur);
-            ll_dot.addView(simpleDraweeView, params);
-            ls_dot.add(simpleDraweeView);
+        // 只有一张图则不显示指示圆点
+        if(len > 1) {
+            for (int i = 0; i < len; i++) {
+                SimpleDraweeView simpleDraweeView = new SimpleDraweeView(context);
+                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT);
+                params.leftMargin = 5;
+                params.rightMargin = 5;
+                simpleDraweeView.setBackgroundResource((0 == i) ? R.drawable.dot_focus : R.drawable.dot_blur);
+                ll_dot.addView(simpleDraweeView, params);
+                ls_dot.add(simpleDraweeView);
+            }
         }
 
         for(int i=0; i<len; i++){
@@ -116,7 +119,9 @@ public class ViewPageLayout extends FrameLayout implements View.OnClickListener 
         currentItem = 0;
         vp_sliding.addOnPageChangeListener(new OnSlidingChangeListener());
 
-        startAutoPlay();
+        if(views.size() > 1) {
+            startAutoPlay();
+        }
     }
 
     private void startAutoPlay() {
@@ -149,10 +154,11 @@ public class ViewPageLayout extends FrameLayout implements View.OnClickListener 
         @Override
         public int getCount() {
 //            return views.size();
-            if(views.size() > 0) {
+            if(views.size() > 1) {
+                // 有多张图片则返回无穷大小，使轮播动画无边际效果。
                 return Integer.MAX_VALUE;
             }else {
-                return 0;
+                return views.size();
             }
         }
 
@@ -205,11 +211,13 @@ public class ViewPageLayout extends FrameLayout implements View.OnClickListener 
             int realPosition = correctPosion(position);
             currentItem = position;
 
-            for(int i=0; i<views.size(); i++){
-                if(i == realPosition){
-                    ls_dot.get(i).setBackgroundResource(R.drawable.dot_focus);
-                }else {
-                    ls_dot.get(i).setBackgroundResource(R.drawable.dot_blur);
+            if(ls_dot.size() == views.size()) {
+                for (int i = 0; i < views.size(); i++) {
+                    if (i == realPosition) {
+                        ls_dot.get(i).setBackgroundResource(R.drawable.dot_focus);
+                    } else {
+                        ls_dot.get(i).setBackgroundResource(R.drawable.dot_blur);
+                    }
                 }
             }
         }

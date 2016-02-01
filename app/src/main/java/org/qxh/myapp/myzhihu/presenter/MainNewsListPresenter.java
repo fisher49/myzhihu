@@ -6,13 +6,16 @@ import org.qxh.myapp.myzhihu.app.EventBody;
 import org.qxh.myapp.myzhihu.config.Constant;
 import org.qxh.myapp.myzhihu.model.entities.BeforeNewsEntity;
 import org.qxh.myapp.myzhihu.model.entities.LatestNewsEntity;
+import org.qxh.myapp.myzhihu.model.entities.StoriesEntity;
 import org.qxh.myapp.myzhihu.model.entities.ThemeContentEntity;
+import org.qxh.myapp.myzhihu.model.entities.TopStoriesEntity;
 import org.qxh.myapp.myzhihu.model.net.HttpUtils;
 import org.qxh.myapp.myzhihu.model.usecase.LatestNewsUsecase;
 import org.qxh.myapp.myzhihu.model.usecase.ThemeContentUsecase;
 import org.qxh.myapp.myzhihu.utils.Utility;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import de.greenrobot.event.EventBus;
@@ -168,15 +171,19 @@ public class MainNewsListPresenter {
 
         }else {
             ThemeContentEntity entity = themeContentUsecase.getLocalThemeContent(id);
-            EventBus.getDefault().post(new EventBody(Constant.EVENT_MAIN_NEWS_UPDATE_THEME_SUCCESS, entity));
+            postUpdateThemeEvent(entity);
         }
+    }
+
+    private void postUpdateThemeEvent(ThemeContentEntity entity){
+        EventBus.getDefault().post(new EventBody(Constant.EVENT_MAIN_NEWS_UPDATE_THEME_SUCCESS, formatThemeContentToNews(entity)));
     }
 
     private void onDownloadThemeSuccess(int id, String json){
         ThemeContentEntity entity = themeContentUsecase.parseThemeContentJson(json);
         themeContentUsecase.saveThemesContentLocal(id, json);
 
-        EventBus.getDefault().post(new EventBody(Constant.EVENT_MAIN_NEWS_UPDATE_THEME_SUCCESS, entity));
+        postUpdateThemeEvent(entity);
     }
 
     public void initListContext() {
@@ -184,9 +191,37 @@ public class MainNewsListPresenter {
             if(Utility.isNetworkConnected(context)) {
                 downloadNewsRemote();
             }else {
-                getLocalNews(0);
+                LatestNewsEntity entity = getLocalNews(0);
+                if(entity != null) {
+                    EventBus.getDefault().post(new EventBody(Constant.EVENT_MAIN_NEWS_UPDATE_THEME_SUCCESS, entity));
+                }
             }
+        }else{
+            getThemeContent(Integer.valueOf(tag));
         }
+    }
+
+    private LatestNewsEntity formatThemeContentToNews(ThemeContentEntity entity){
+        LatestNewsEntity news = new LatestNewsEntity();
+        List<StoriesEntity> stories = formatThemesStoriesToNews(entity.getStories());
+
+        List<TopStoriesEntity> topStories = new ArrayList<>();
+        TopStoriesEntity topStory = new TopStoriesEntity(entity.getBackground(), 0, 0, "", entity.getDescription());
+        topStories.add(topStory);
+
+        news.setDate("");
+        news.setStories(stories);
+        news.setTop_stories(topStories);
+        return news;
+    }
+
+    private List<StoriesEntity> formatThemesStoriesToNews(List<ThemeContentEntity.StoriesEntity> themesStories){
+        List<StoriesEntity> stories = new ArrayList<>();
+        for(ThemeContentEntity.StoriesEntity entity : themesStories){
+            StoriesEntity story = new StoriesEntity(entity.getType(), entity.getId(), "", entity.getTitle(), entity.getImages());
+            stories.add(story);
+        }
+        return stories;
     }
 
     /**
