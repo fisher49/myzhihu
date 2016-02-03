@@ -9,7 +9,6 @@ import org.qxh.myapp.myzhihu.model.entities.LatestNewsEntity;
 import org.qxh.myapp.myzhihu.model.entities.StoriesEntity;
 import org.qxh.myapp.myzhihu.model.entities.ThemeContentEntity;
 import org.qxh.myapp.myzhihu.model.entities.TopStoriesEntity;
-import org.qxh.myapp.myzhihu.model.net.HttpUtils;
 import org.qxh.myapp.myzhihu.model.usecase.LatestNewsUsecase;
 import org.qxh.myapp.myzhihu.model.usecase.ThemeContentUsecase;
 import org.qxh.myapp.myzhihu.utils.Utility;
@@ -26,7 +25,7 @@ import okhttp3.Response;
  * Created by QXH on 2016/1/26.
  */
 public class MainNewsListPresenter {
-    private HttpUtils httpUtils;
+//    private HttpUtils httpUtils;
     private Context context;
     private LatestNewsUsecase usecase;
     private ThemeContentUsecase themeContentUsecase;
@@ -36,7 +35,7 @@ public class MainNewsListPresenter {
     public MainNewsListPresenter(Context context, String tag) {
         this.context = context;
         this.tag = tag;
-        httpUtils = HttpUtils.getInstance();
+//        httpUtils = HttpUtils.getInstance();
         usecase = new LatestNewsUsecase(context);
         themeContentUsecase = new ThemeContentUsecase(context);
     }

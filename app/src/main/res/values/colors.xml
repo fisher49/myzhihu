@@ -27,5 +27,6 @@
     <color name="main_list_item_foreground_dark">@color/Grey400</color>
     <color name="main_list_item_background_light">@color/Grey400</color>
     <color name="main_list_item_background_dark">@color/Grey400</color>
+    <color name="light_toolbar">@android:color/holo_blue_dark</color>
 
 </resources>

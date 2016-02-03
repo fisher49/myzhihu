@@ -1,6 +1,7 @@
 package org.qxh.myapp.myzhihu.view;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,6 +14,7 @@ import org.qxh.myapp.myzhihu.R;
 import org.qxh.myapp.myzhihu.app.BaseFragment;
 import org.qxh.myapp.myzhihu.app.CommonAdapter;
 import org.qxh.myapp.myzhihu.app.EventBody;
+import org.qxh.myapp.myzhihu.app.NewsTip;
 import org.qxh.myapp.myzhihu.app.ViewHolder;
 import org.qxh.myapp.myzhihu.config.Constant;
 import org.qxh.myapp.myzhihu.model.entities.BeforeNewsEntity;
@@ -58,6 +60,11 @@ public class MainNewsListFragment extends BaseFragment{
             @Override
             public void click(View v, TopStoriesEntity entity) {
                 // TODO:转入文章浏览界面
+                Intent intent = new Intent(mActivity, WebViewActivity.class);
+                Bundle bundle = new Bundle();
+                bundle.putSerializable("newstip", new NewsTip(entity.getId(), entity.getTitle()));
+                intent.putExtras(bundle);
+                startActivity(intent);
             }
         });
         lv_news.addHeaderView(listHeader);

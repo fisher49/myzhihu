@@ -12,6 +12,7 @@ public class Constant {
     public static final String LATEST_NEWS_URL = "news/latest";
     public static final String LATEST_NEWS_BEFORE_URL = "news/before/";
     public static final String THEME_CONTENT_URL = "theme/";
+    public static final String NEWS_CONTENT_URL = "news/";
 
     public static final String JSON_TAG_START_IMAGE = "img";
     public static final String JSON_TAG_OTHERS = "others";
@@ -34,6 +35,8 @@ public class Constant {
     public static final String JSON_TAG_BIO = "bio";
     public static final String JSON_TAG_AVATAR = "avatar";
     public static final String JSON_TAG_EDITORS = "editors";
+    public static final String JSON_TAG_BODY = "body";
+    public static final String JSON_TAG_SHARE_URL = "share_url";
 
     public static final String EVENT_DEFAULT = "EvtDefault";
     public static final String EVENT_START_SHOW_IMAGE_BITMAP = "EvtStart01";
@@ -53,7 +56,11 @@ public class Constant {
     public static final String EVENT_MAIN_NEWS_UPDATE_THEME_FAIL = "EvtMN02";
     public static final String EVENT_MAIN_NEWS_UPDATE_THEME_SUCCESS = "EvtMN03";
 
+
 //    public static final String EVENT_MAIN_UPDATE_LIST = "EvtMain01";
+
+    public static final String EVENT_NEWS_CONTENT_LOAD_FAIL = "EvtNC01";
+    public static final String EVENT_NEWS_CONTENT_LOAD_SUCCESS = "EvtNC02";
 
     public static final String EVENT_SLIDING_PAGE_UPDATE = "EvtSP01";
 

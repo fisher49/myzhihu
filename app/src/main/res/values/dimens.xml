@@ -3,4 +3,5 @@
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="fragment_topic_type_menu_width">300dp</dimen>
+    <dimen name="activity_toolbar_height">230dp</dimen>
 </resources>
