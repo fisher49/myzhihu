@@ -74,10 +74,28 @@ public class WebViewActivity extends BaseActivity {
         webView.getSettings().setAppCacheEnabled(true);
 
 //        setStatusBarColor(getResources().getColor(R.color.light_toolbar));
+
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+//                presenter.postEventUpdateNewsList();
+                finish();
+            }
+        });
     }
 
     private void onLoadSuccess(NewsContentEntity entity){
-        draweeView.setImageURI(Uri.parse(entity.getImage()));
+        String imageUrl = entity.getImage();
+        if(imageUrl != null) {
+            draweeView.setImageURI(Uri.parse(imageUrl));
+        }else {
+//
+//            ViewGroup.LayoutParams params = appBarLayout.getLayoutParams();
+//            params.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+//            appBarLayout.setLayoutParams(params);
+//            draweeView.setVisibility(View.GONE);
+//            collapsLayout.setTitle(getResources().getString(R.string.nc_default_title));
+        }
 
         String css = "<link rel=\"stylesheet\" href=\"file:///android_asset/css/news.css\" type=\"text/css\">";
         String html = "<html><head>" + css + "</head><body>" + entity.getBody() + "</body></html>";

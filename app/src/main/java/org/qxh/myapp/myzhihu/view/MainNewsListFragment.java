@@ -7,7 +7,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
+import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.qxh.myapp.myzhihu.R;
@@ -59,12 +61,10 @@ public class MainNewsListFragment extends BaseFragment{
 
             @Override
             public void click(View v, TopStoriesEntity entity) {
-                // TODO:转入文章浏览界面
-                Intent intent = new Intent(mActivity, WebViewActivity.class);
-                Bundle bundle = new Bundle();
-                bundle.putSerializable("newstip", new NewsTip(entity.getId(), entity.getTitle()));
-                intent.putExtras(bundle);
-                startActivity(intent);
+                // 显示主题内容时，轮播位置内容当作标题栏不能点击
+                if(presenter.isLatestNewsContent(getTag())) {
+                    viewNewsContent(entity.getId(), entity.getTitle());
+                }
             }
         });
         lv_news.addHeaderView(listHeader);
@@ -85,13 +85,27 @@ public class MainNewsListFragment extends BaseFragment{
                 }
 
                 // 在首页新闻状态下可下拉加载过往新闻
-                if(MainNewsListFragment.this.getTag().equals(Constant.TAG_MAIN_LIST_FRAGMENT_LATEST)) {
+                if(presenter.isLatestNewsContent(getTag())) {
                     String earliestDate = MainNewsListFragment.this.adapter.getEarliestDate();
                     if ((firstVisibleItem + visibleItemCount == totalItemCount) && (earliestDate != null)
                             && (totalItemCount != 0) && !isLoading) {
                         isLoading = true;
                         presenter.downloadBeforeNewsRemote(earliestDate);
                     }
+                }
+            }
+        });
+        lv_news.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                if(position > 0) {
+                    // 列表第一项固定图片轮播控件，其他内容从position:1开始
+                    StoriesEntity entity = storiesList.get(position-1);
+                    presenter.insertReadId(entity.getId());
+                    TextView textView = (TextView)view.findViewById(R.id.tv_news_summary);
+                    textView.setTextColor(getResources().getColor(R.color.main_list_item_selector_light));
+
+                    viewNewsContent(entity.getId(), entity.getTitle());
                 }
             }
         });
@@ -119,7 +133,8 @@ public class MainNewsListFragment extends BaseFragment{
 
         @Override
         public void convert(ViewHolder holder, StoriesEntity storiesEntity) {
-            holder.setText(R.id.tv_news_summary, storiesEntity.getTitle());
+            holder.setText(R.id.tv_news_summary, storiesEntity.getTitle(),
+                    presenter.isReadStatusById(storiesEntity.getId()) ? R.color.main_list_item_selector_light : R.color.Black);
             if(storiesEntity.getImages() != null) {
                 holder.setDraweeImageURL(R.id.sdv_thumbnail, storiesEntity.getImages().get(0));
 //                holder.setViewVisible(R.id.sdv_thumbnail, View.VISIBLE);
@@ -188,6 +203,18 @@ public class MainNewsListFragment extends BaseFragment{
         isLoading = false;
     }
 
+    private void viewNewsContent(int id, String Title){
+        Intent intent = new Intent(mActivity, WebViewActivity.class);
+        Bundle bundle = new Bundle();
+        bundle.putSerializable("newstip", new NewsTip(id, Title));
+        intent.putExtras(bundle);
+        startActivity(intent);
+    }
+
+//    private void updateNewsListStatus(){
+//        adapter.notifyDataSetChanged();
+//    }
+
 //    private void updateThemeContent(int id) {
 //        presenter.getThemeContent(id);
 //    }
@@ -217,6 +244,11 @@ public class MainNewsListFragment extends BaseFragment{
             case Constant.EVENT_MAIN_NEWS_UPDATE_THEME_FAIL:
                 Toast.makeText(mActivity, getResources().getString(R.string.err_load_theme_content), Toast.LENGTH_SHORT).show();
                 break;
+
+//            case Constant.EVENT_WEB_VIEW_UPDATE_READ_STATUS:
+//                updateNewsListStatus();
+//                break;
+
             default:break;
         }
     }

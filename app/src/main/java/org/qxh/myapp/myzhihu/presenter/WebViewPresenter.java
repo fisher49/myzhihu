@@ -65,6 +65,7 @@ public class WebViewPresenter {
 
         NewsContentEntity entity = usecase.parseNewsContentJson(json);
         if(entity != null) {
+            usecase.saveNewsContentLocal(entity.getId(), json);
             postEventLoadContentSuccess(entity);
         }else {
             postEventLoadContentFail();
@@ -82,4 +83,8 @@ public class WebViewPresenter {
     private void postEventLoadContentSuccess(NewsContentEntity entity){
         EventBus.getDefault().post(new EventBody(Constant.EVENT_NEWS_CONTENT_LOAD_SUCCESS, entity));
     }
+
+//    public void postEventUpdateNewsList(){
+//        EventBus.getDefault().post(new EventBody(Constant.EVENT_WEB_VIEW_UPDATE_READ_STATUS, null));
+//    }
 }

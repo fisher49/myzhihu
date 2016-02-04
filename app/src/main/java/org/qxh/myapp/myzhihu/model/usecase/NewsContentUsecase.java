@@ -28,10 +28,10 @@ public class NewsContentUsecase {
                 JSONObject jsonObject = new JSONObject(json);
 
                 NewsContentEntity content = new NewsContentEntity(jsonObject.getString(Constant.JSON_TAG_BODY),
-                        jsonObject.getString(Constant.JSON_TAG_IMAGE_SOURCE),
+                        (jsonObject.has(Constant.JSON_TAG_IMAGE_SOURCE) ? jsonObject.getString(Constant.JSON_TAG_IMAGE_SOURCE) : null),
                         jsonObject.getString(Constant.JSON_TAG_TITLE),
-                        jsonObject.getString(Constant.JSON_TAG_IMAGE),
-                        jsonObject.getString(Constant.JSON_TAG_SHARE_URL),
+                        (jsonObject.has(Constant.JSON_TAG_IMAGE) ? jsonObject.getString(Constant.JSON_TAG_IMAGE) : null),
+                        (jsonObject.has(Constant.JSON_TAG_SHARE_URL) ? jsonObject.getString(Constant.JSON_TAG_SHARE_URL) : null),
                         jsonObject.getString(Constant.JSON_TAG_GA_PREFIX),
                         jsonObject.getInt(Constant.JSON_TAG_TYPE),
                         jsonObject.getInt(Constant.JSON_TAG_ID),

@@ -24,6 +24,7 @@
     <color name="main_list_date">@color/Grey800</color>
     <color name="main_list_selector">@color/Grey700</color>
     <color name="main_list_item_foreground_light">@color/White</color>
+    <color name="main_list_item_selector_light">@color/Gray600</color>
     <color name="main_list_item_foreground_dark">@color/Grey400</color>
     <color name="main_list_item_background_light">@color/Grey400</color>
     <color name="main_list_item_background_dark">@color/Grey400</color>

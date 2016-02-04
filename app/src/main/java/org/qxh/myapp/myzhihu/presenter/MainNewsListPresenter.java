@@ -10,6 +10,7 @@ import org.qxh.myapp.myzhihu.model.entities.StoriesEntity;
 import org.qxh.myapp.myzhihu.model.entities.ThemeContentEntity;
 import org.qxh.myapp.myzhihu.model.entities.TopStoriesEntity;
 import org.qxh.myapp.myzhihu.model.usecase.LatestNewsUsecase;
+import org.qxh.myapp.myzhihu.model.usecase.ReadStatusUsecase;
 import org.qxh.myapp.myzhihu.model.usecase.ThemeContentUsecase;
 import org.qxh.myapp.myzhihu.utils.Utility;
 
@@ -31,6 +32,7 @@ public class MainNewsListPresenter {
     private ThemeContentUsecase themeContentUsecase;
     private int currentId = -1;
     private String tag = Constant.TAG_MAIN_LIST_FRAGMENT_LATEST;
+    private ReadStatusUsecase readStatusUsecase;
 
     public MainNewsListPresenter(Context context, String tag) {
         this.context = context;
@@ -38,6 +40,7 @@ public class MainNewsListPresenter {
 //        httpUtils = HttpUtils.getInstance();
         usecase = new LatestNewsUsecase(context);
         themeContentUsecase = new ThemeContentUsecase(context);
+        readStatusUsecase = new ReadStatusUsecase(context);
     }
 
     public void downloadNewsRemote(){
@@ -223,11 +226,15 @@ public class MainNewsListPresenter {
         return stories;
     }
 
-    /**
-     * 更新主页图片轮播控件
-     * @param topStoriesList 头条新闻信息
-     */
-//    public void updateSlidingPage(List<TopStoriesEntity> topStoriesList) {
-//        EventBus.getDefault().post(new EventBody(Constant.EVENT_SLIDING_PAGE_UPDATE, topStoriesList));
-//    }
+    public void insertReadId(int id){
+        readStatusUsecase.insertReadId(String.valueOf(id));
+    }
+
+    public boolean isReadStatusById(int id) {
+        return readStatusUsecase.isReadStatusById(String.valueOf(id));
+    }
+
+    public boolean isLatestNewsContent(String tag){
+        return tag.equals(Constant.TAG_MAIN_LIST_FRAGMENT_LATEST);
+    }
 }

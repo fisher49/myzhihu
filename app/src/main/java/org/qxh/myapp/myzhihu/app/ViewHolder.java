@@ -86,6 +86,19 @@ public class ViewHolder {
     }
 
     /**
+     * 如果Adapter是TextView ，设置TextView的值
+     * @param viewId
+     * @param text
+     * @return
+     */
+    public ViewHolder setText(int viewId,String text, int colorResourceID){
+        TextView tv =getView(viewId);
+        tv.setText(text);
+        tv.setTextColor(context.getResources().getColor(colorResourceID));
+        return this;
+    }
+
+    /**
      *
      * @param viewId 资源ID
      * @param text 内容
