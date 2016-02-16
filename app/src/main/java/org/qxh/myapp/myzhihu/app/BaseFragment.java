@@ -58,5 +58,15 @@ public abstract class BaseFragment extends Fragment{
 
     }
 
+    public void onChildFragmentEvent(EventBody event, int... args){
+        BaseFragment fragment;
+        for(int i=0; i<args.length; i++){
+            fragment = (BaseFragment)getChildFragmentManager().findFragmentById(args[i]);
+            if(fragment != null) {
+                fragment.onEventMainThread(event);
+            }
+        }
+    }
+
     protected abstract View initView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState);
 }

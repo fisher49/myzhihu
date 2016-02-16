@@ -249,7 +249,9 @@ public class MainNewsListFragment extends BaseFragment{
 //                updateNewsListStatus();
 //                break;
 
-            default:break;
+            default:
+//                onChildFragmentEvent(event);
+                break;
         }
     }
 
